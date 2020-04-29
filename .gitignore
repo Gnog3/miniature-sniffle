@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+.idea/
+cmake-build-*/
+2.5.1-SFML/
