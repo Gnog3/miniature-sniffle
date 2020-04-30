@@ -35,7 +35,7 @@ class Game
 
         bool pollEvent(sf::Event &event);
 
-        void handleUpdate(sf::Event event);
+        void handleEvent(sf::Event event);
 
         void update();
 

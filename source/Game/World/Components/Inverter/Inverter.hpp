@@ -12,9 +12,7 @@ class Inverter : public BasicComponent
         sf::Sprite getSprite(sf::Texture *texture, sf::Color in, sf::Color out) override;
 
     public:
-        Inverter();
-
-        Inverter(sf::Vector2u position, uint8_t rotation);
+        Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation);
 
         void update() override;
 

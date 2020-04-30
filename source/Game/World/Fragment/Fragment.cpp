@@ -1,3 +1,4 @@
+
 #include "Fragment.hpp"
 
 Fragment::Fragment(sf::Vector2<uint8_t> position)
@@ -14,28 +15,44 @@ Fragment::~Fragment()
 void Fragment::addComponent(Component component, sf::Vector2u position, uint8_t rotation)
 {
     componentAmount++;
-    BasicComponent* newComponentList = new BasicComponent [componentAmount];
-    for (int i = 0; i < componentAmount - 1; i++)
+    BasicComponent* newComponentList = new BasicComponent[componentAmount];
+    if (componentList != nullptr)
     {
-        newComponentList[i] = componentList[i];
+        //TODO: жесткий костыль, переделать нахуй все
+        std::memcpy(newComponentList, componentList, sizeof(BasicComponent) * (componentAmount - 1));
+        for (int i = 0; i < componentAmount - 1; i++)
+        {
+            newComponentList[i].fixMove(componentList[i]);
+        }
+        delete[] componentList;
     }
-    delete[] componentList;
     componentList = newComponentList;
 
 
     switch (component)
     {
         case Component::Inverter:
-            new (&componentList[componentAmount - 1]) class Inverter(position, rotation);
+            new(&componentList[componentAmount - 1]) class Inverter((sf::Vector2<uint8_t>) position, this->position, rotation);
             //componentList[componentAmount - 1] = Inverter(position, rotation);
             break;
         case Component::Blotter:
-            new (&componentList[componentAmount - 1]) class Blotter(position, rotation);
+            new(&componentList[componentAmount - 1]) class Blotter((sf::Vector2<uint8_t>) position, this->position, rotation);
             //componentList[componentAmount - 1] = Blotter(position, rotation);
             break;
     }
+}
 
-    //componentList[componentAmount - 1] = new BasicComponent(component, position, 0);
+BasicComponent* Fragment::getComponent(sf::Vector2<uint8_t> position)
+{
+    for (uint16_t i = 0; i < componentAmount; i++)
+    {
+        sf::Vector2<uint8_t> componentPosition = componentList[i].getPosition();
+        if (componentPosition == position)
+        {
+            return &componentList[i];
+        }
+    }
+    return nullptr;
 }
 
 void Fragment::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)
@@ -47,7 +64,7 @@ void Fragment::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::V
     rectangleShape.setPosition(
             ((sf::Vector2f) position * (float) (16 * 5) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
             chunkPosition);
-    window->draw(rectangleShape);
+
 
     sf::Vector2f fragmentPosition = ((sf::Vector2f) position * (float) (16 * 5) - playerPosition) * (float) scale + chunkPosition;
 

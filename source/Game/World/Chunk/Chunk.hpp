@@ -27,6 +27,8 @@ class Chunk
 
         void addComponent(Component component, sf::Vector2u position, uint8_t rotation);
 
+        BasicComponent* getComponent(sf::Vector2u componentPosition);
+
         void draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale);
 };
 

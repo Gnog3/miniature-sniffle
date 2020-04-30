@@ -42,7 +42,7 @@ BackgroundBoard::BackgroundBoard(const sf::Vector2u windowResolution, const uint
     sprite.setTexture(texture);
     sprite.setScale(sf::Vector2f(initScale, initScale));
     sprite.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(windowResolution.x + size * initScale, windowResolution.y + size * initScale)));
-    delete array;
+    delete[] array;
 }
 
 void BackgroundBoard::handleScale(uint8_t scale, sf::Vector2f playerPosition)

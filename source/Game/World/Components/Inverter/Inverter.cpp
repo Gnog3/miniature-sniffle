@@ -21,10 +21,8 @@ sf::Sprite Inverter::getSprite(sf::Texture* texture, sf::Color in, sf::Color out
     return sprite;
 }
 
-Inverter::Inverter() : BasicComponent()
-{}
 
-Inverter::Inverter(sf::Vector2u position, uint8_t rotation) : BasicComponent(Component::Inverter, position, rotation)
+Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation) : BasicComponent(Component::Inverter, position, fragmentPosition, rotation)
 {}
 
 void Inverter::update()
@@ -55,5 +53,9 @@ void Inverter::draw(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uin
     sprite[state].setPosition(fragmentPosition + (position + sf::Vector2f(2.5f, 2.5f)) * (float) scale);
     sf::Vector2f abc = sprite[state].getPosition();
     window->draw(sprite[state]);
-    window->draw(quad, 4, sf::PrimitiveType::Quads);
+    for (uint8_t i = 0; i < wiredOutAmount; i++)
+    {
+        sf::Vector2<uint8_t> otherPosition = getWiredOut(i)->getPosition();
+        std::cout << getWiredOut(i) << std::endl;
+    }
 }

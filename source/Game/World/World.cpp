@@ -44,10 +44,17 @@ void World::addComponent(Component component, sf::Vector2i position, uint8_t rot
 
     if (chunks[absolute] == nullptr)
     {
-        chunks[absolute] = new Chunk((sf::Vector2<int8_t>)chunk);
+        chunks[absolute] = new Chunk((sf::Vector2<int8_t>) chunk);
     }
 
     chunks[absolute]->addComponent(component, handlePosition(position), rotation);
+}
+
+void World::connect(sf::Vector2i from, sf::Vector2i to)
+{
+    BasicComponent* first = chunks[getAbsolute(getChunk(from))]->getComponent(handlePosition(from));
+    BasicComponent* second = chunks[getAbsolute(getChunk(to))]->getComponent(handlePosition(to));
+    first->connect(second);
 }
 
 void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale)

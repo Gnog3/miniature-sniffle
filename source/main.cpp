@@ -8,12 +8,11 @@ int main()
 {
     // Game
     {
-        void* a;
-        if (sizeof(a) == 8)
+        if (sizeof(nullptr) == 8)
         {
             std::cout << "x64" << std::endl;
         }
-        else if (sizeof(a) == 4)
+        else if (sizeof(nullptr) == 4)
         {
             std::cout << "x32" << std::endl;
         }
@@ -26,7 +25,7 @@ int main()
         sf::Event event{};
         while (game.pollEvent(event))
         {
-            game.handleUpdate(event);
+            game.handleEvent(event);
         }
         
         game.update();

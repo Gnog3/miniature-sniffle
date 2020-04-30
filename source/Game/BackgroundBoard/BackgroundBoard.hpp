@@ -14,6 +14,7 @@ class BackgroundBoard
         sf::Texture texture;
         sf::Sprite sprite;
 
+        [[nodiscard]]
         static uint8_t* getColorArray(sf::Color background, sf::Color foreground, uint8_t size, uint8_t thickness);
 
     public:

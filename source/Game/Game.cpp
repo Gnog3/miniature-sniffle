@@ -19,15 +19,37 @@ Game::Game()
     //window.setVerticalSyncEnabled(true);
     windowResolution = window.getSize();
     deltaTimeClock.restart();
-    font.loadFromFile("Arial.ttf");
+    font.loadFromFile("font.ttf");
     //world.addComponent(Component::Inverter, sf::Vector2i(0, 0), 0);
-    world.addComponent(Component::Inverter, sf::Vector2i(3, 3), 0);
-    world.addComponent(Component::Inverter, sf::Vector2i(5, 3), 3);
-    world.addComponent(Component::Inverter, sf::Vector2i(7, 3), 2);
-    world.addComponent(Component::Inverter, sf::Vector2i(9, 3), 1);
-    world.addComponent(Component::Inverter, sf::Vector2i(20, 3), 0);
-    world.addComponent(Component::Inverter, sf::Vector2i(-1, -1), 0);
-    world.addComponent(Component::Inverter, sf::Vector2i(-1, -1), 1);
+
+    const int ys = 2000;
+    const int xs = 4000;
+    const int total = ys * xs;
+    uint64_t amount = 0;
+    for (int y = 0; y < ys * 2; y += 2)
+    {
+        for (int x = 0; x < xs * 2; x += 2)
+        {
+            world.addComponent(Component::Inverter, sf::Vector2i(x, y), 0);
+            ++amount;
+            if (amount % (total / 100) == 0)
+            {
+                cout << (double) amount / total * 100 << "%" << endl;
+            }
+            //cout << amount << endl;
+        }
+    }
+    cout << amount << endl;
+
+
+//    world.connect(sf::Vector2i(5, 3), sf::Vector2i(3, 3));
+//    world.connect(sf::Vector2i(3, 3), sf::Vector2i(5, 3));
+//    world.addComponent(Component::Inverter, sf::Vector2i(5, 3), 3);
+//    world.addComponent(Component::Inverter, sf::Vector2i(7, 3), 2);
+//    world.addComponent(Component::Inverter, sf::Vector2i(9, 3), 1);
+//    world.addComponent(Component::Inverter, sf::Vector2i(20, 3), 0);
+//    world.addComponent(Component::Inverter, sf::Vector2i(-1, -1), 0);
+//    world.addComponent(Component::Inverter, sf::Vector2i(-1, -1), 1);
 }
 
 bool Game::isOpen()
@@ -35,12 +57,12 @@ bool Game::isOpen()
     return window.isOpen();
 }
 
-bool Game::pollEvent(sf::Event &event)
+bool Game::pollEvent(sf::Event& event)
 {
     return window.pollEvent(event);
 }
 
-void Game::handleUpdate(sf::Event event)
+void Game::handleEvent(sf::Event event)
 {
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     if (event.type == sf::Event::Closed ||
@@ -76,7 +98,7 @@ void Game::handleUpdate(sf::Event event)
                 }
                 player.setScale(scale);
                 sf::Vector2f mousePositionAfter = mouseToCellPosition(mousePosition);
-                sf::Vector2f offset = (sf::Vector2f)(sf::Vector2i)(mousePositionAfter - mousePositionBefore);
+                sf::Vector2f offset = mousePositionAfter - mousePositionBefore;
                 player.move(-offset);
                 backgroundBoard.handleScale(scale, player.getPosition());
 
