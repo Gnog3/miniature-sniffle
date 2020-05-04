@@ -29,11 +29,11 @@ uint8_t* BackgroundBoard::getColorArray(sf::Color background, sf::Color foregrou
 
 BackgroundBoard::BackgroundBoard(const sf::Vector2u windowResolution, const uint8_t initScale)
 {
-    const uint8_t backBrightness = 200;
-    const uint8_t foreBrightness = 100;
+    const uint8_t backBrightness = 170;
+    const uint8_t foreBrightness = 110;
     const sf::Color background(backBrightness, backBrightness, backBrightness, 255);
     const sf::Color foreground(foreBrightness, foreBrightness, foreBrightness, 255);
-    const uint8_t size = 5;
+    const uint8_t size = 11;
     const uint8_t thickness = 1;
     uint8_t* array = getColorArray(background, foreground, size, thickness);
     texture.create(size, size);

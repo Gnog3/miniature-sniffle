@@ -7,16 +7,21 @@
 class Peg : public BasicComponent
 {
     private:
-        sf::Sprite getSprite(sf::Texture *texture, sf::Color in, sf::Color out) override;
+        sf::Sprite getBodySprite(sf::Texture* texture) override;
 
+        sf::Sprite getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out) override;
     public:
-        Peg();
+        Peg(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition);
 
-        Peg(sf::Vector2u position, uint8_t rotation);
+        sf::Vector2f getInputPoint() override;
 
-        void update() override;
+        sf::Vector2f getOutputPoint() override;
 
-        void draw(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
+        void drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
+
+        void drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
+
+        void drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
 };
 
 

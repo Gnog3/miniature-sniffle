@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include "BackgroundBoard/BackgroundBoard.hpp"
 #include "Player/Player.hpp"
 #include "World/World.hpp"
@@ -14,7 +16,7 @@ class Game
     private:
         sf::String windowLabel = "The Window";
         sf::Vector2u windowResolution = sf::Vector2u(1600, 900);
-        sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(windowResolution.x, windowResolution.y), windowLabel);
+        sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(windowResolution.x, windowResolution.y), windowLabel, sf::Style::Default, sf::ContextSettings(0, 0, 4));
         sf::Clock deltaTimeClock;
         sf::Font font;
 

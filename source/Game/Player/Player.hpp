@@ -26,6 +26,8 @@ class Player
 
         sf::Vector2f handleMousePosition(sf::Vector2i mousePosition);
 
+        void setPosition(sf::Vector2f value);
+
         sf::Vector2f getPosition();
 };
 

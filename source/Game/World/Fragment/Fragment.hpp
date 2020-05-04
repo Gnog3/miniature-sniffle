@@ -6,6 +6,7 @@
 #include "../Components/BasicComponent.hpp"
 #include "../Components/Inverter/Inverter.hpp"
 #include "../Components/Blotter/Blotter.hpp"
+#include "../Components/Peg/Peg.hpp"
 #include "../Components/Component.hpp"
 
 
@@ -25,7 +26,11 @@ class Fragment
 
         BasicComponent* getComponent(sf::Vector2<uint8_t> position);
 
-        void draw(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale);
+        void drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale);
+
+        void drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale);
+
+        void drawPegs(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale);
 };
 
 

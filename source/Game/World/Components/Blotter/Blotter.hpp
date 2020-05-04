@@ -9,14 +9,12 @@
 class Blotter : public BasicComponent
 {
     private:
-        sf::Sprite getSprite(sf::Texture* texture, sf::Color in, sf::Color out) override;
+        sf::Sprite getBodySprite(sf::Texture* texture) override;
 
     public:
         Blotter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation);
 
         void update() override;
-
-        void draw(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
 };
 
 

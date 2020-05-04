@@ -29,7 +29,11 @@ class World
 
         void addComponent(Component component, sf::Vector2i position, uint8_t rotation);
 
-        void connect(sf::Vector2i from, sf::Vector2i to);
+        BasicComponent* getComponent(sf::Vector2i componentPosition);
+
+        void connect(sf::Vector2i from, sf::Vector2i to, bool in = false);
+
+        void doTick();
 
         void draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale);
 };

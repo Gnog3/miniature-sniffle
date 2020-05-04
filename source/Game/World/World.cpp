@@ -50,11 +50,27 @@ void World::addComponent(Component component, sf::Vector2i position, uint8_t rot
     chunks[absolute]->addComponent(component, handlePosition(position), rotation);
 }
 
-void World::connect(sf::Vector2i from, sf::Vector2i to)
+BasicComponent* World::getComponent(sf::Vector2i componentPosition)
 {
-    BasicComponent* first = chunks[getAbsolute(getChunk(from))]->getComponent(handlePosition(from));
-    BasicComponent* second = chunks[getAbsolute(getChunk(to))]->getComponent(handlePosition(to));
-    first->connect(second);
+    uint32_t absolute = getAbsolute(getChunk(componentPosition));
+    if (chunks[absolute] == nullptr)
+    {
+        return nullptr;
+    }
+    return chunks[absolute]->getComponent(handlePosition(componentPosition));
+}
+
+void World::connect(sf::Vector2i from, sf::Vector2i to, bool in)
+{
+    BasicComponent* first = getComponent(from);
+    BasicComponent* second = getComponent(to);
+
+    first->connect(second, in);
+}
+
+void World::doTick()
+{
+
 }
 
 void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale)
@@ -62,8 +78,8 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
     sf::Vector2f resolution = (sf::Vector2f) window->getSize();
     sf::Vector2f topleft = playerPosition;
     sf::Vector2f bottomright = playerPosition + resolution / (float) scale;
-    sf::Vector2i fromChunk = getChunk(sf::Vector2i(floor(topleft.x / 5), floor(topleft.y / 5)));
-    sf::Vector2i toChunk = getChunk(sf::Vector2i(floor(bottomright.x / 5), floor(bottomright.y / 5)));
+    sf::Vector2i fromChunk = getChunk(sf::Vector2i(floor(topleft.x / 11), floor(topleft.y / 11)));
+    sf::Vector2i toChunk = getChunk(sf::Vector2i(floor(bottomright.x / 11), floor(bottomright.y / 11)));
 
     for (int y = fromChunk.y; y <= toChunk.y; y++)
     {

@@ -35,19 +35,24 @@ sf::Vector2f Player::handleMousePosition(sf::Vector2i mousePosition)
         const float sensitivity = 0.5f;
         sf::Vector2i difference = mousePosition - lastMousePosition;
         lastMousePosition = mousePosition;
-        sf::Vector2f newPosition = position + sf::Vector2f(- difference.x, - difference.y) / (float) scale;
+        sf::Vector2f newPosition = position + sf::Vector2f(-difference.x, -difference.y) / (float) scale;
         position = sf::Vector2f((newPosition.x * 1) / 1, (newPosition.y * 1) / 1);
-    }
-    else
+    } else
     {
         lastMousePosition = mousePosition;
     }
     return position;
 }
 
+void Player::setPosition(sf::Vector2f value)
+{
+    position = value;
+}
+
 sf::Vector2f Player::getPosition()
 {
     return position;
 }
+
 
 #pragma clang diagnostic pop
