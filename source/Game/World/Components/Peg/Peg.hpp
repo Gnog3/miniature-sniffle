@@ -13,6 +13,8 @@ class Peg : public BasicComponent
     public:
         Peg(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition);
 
+        bool isPeg() override;
+
         sf::Vector2f getInputPoint() override;
 
         sf::Vector2f getOutputPoint() override;

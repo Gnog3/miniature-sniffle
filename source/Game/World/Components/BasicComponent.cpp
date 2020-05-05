@@ -2,7 +2,6 @@
 #pragma ide diagnostic ignored "modernize-use-auto"
 
 
-#include <iostream>
 #include "BasicComponent.hpp"
 
 /*
@@ -33,37 +32,47 @@ void BasicComponent::insertPointer(BasicComponent* basicComponent, uint32_t offs
 
 void BasicComponent::addInputWire(BasicComponent* basicComponent)
 {
+    for (uint8_t i = 0; i < wiredInAmount; i++)
+        if (getWiredIn(i) == basicComponent)
+            return;
     wiredInAmount++;
     insertPointer(basicComponent, wiredInAmount - 1);
 }
 
 void BasicComponent::addOutputWire(BasicComponent* basicComponent)
 {
+    for (uint8_t i = 0; i < wiredOutAmount; i++)
+        if (getWiredOut(i) == basicComponent)
+            return;
     wiredOutAmount++;
     insertPointer(basicComponent, wiredInAmount + wiredOutAmount - 1);
 }
 
 void BasicComponent::addInputActual(BasicComponent* basicComponent)
 {
+    for (uint16_t i = 0; i < actualInAmount; i++)
+        if (getActualIn(i) == basicComponent)
+            return;
     actualInAmount++;
     insertPointer(basicComponent, wiredInAmount + wiredOutAmount + actualInAmount - 1);
 }
 
 void BasicComponent::addOutputActual(BasicComponent* basicComponent)
 {
+    for (uint16_t i = 0; i < actualOutAmount; i++)
+        if (getActualOut(i) == basicComponent)
+            return;
     actualOutAmount++;
     insertPointer(basicComponent, wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount - 1);
 }
 
-bool BasicComponent::insertIfNotIn(std::vector<BasicComponent*>& components, BasicComponent* basicComponent)
+bool BasicComponent::insertIfNotIn(std::vector<Connection>& connections, Connection connection)
 {
-    bool isIn = false;
-    for (uint32_t i = 0; i < components.size(); i++)
-        if (components[i] == basicComponent)
-            isIn = true;
-    if (isIn)
-        return false;
-    components.push_back(basicComponent);
+    for (uint32_t i = 0; i < connections.size(); i++)
+        if (connections[i].component == connection.component &&
+            connections[i].isOutput == connection.isOutput)
+            return false;
+    connections.push_back(connection);
     return true;
 }
 
@@ -77,42 +86,38 @@ BasicComponent::BasicComponent(Component component, sf::Vector2<uint8_t> positio
 
 void BasicComponent::clonePointersArray()
 {
-    uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount;
+    uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount;
     BasicComponent** newPointers = new BasicComponent* [amount];
     std::memcpy(newPointers, pointers, sizeof(nullptr) * amount);
     pointers = newPointers; // no delete because костыль
 }
 
-void BasicComponent::getRelatedComponents(std::vector<BasicComponent*>& components, bool in, bool out, bool outNeed)
+void BasicComponent::scanComponents(std::vector<Connection>& connections, Scan scan)
 {
-    if (!insertIfNotIn(components, this))
-    {
+    if (!insertIfNotIn(connections, Connection{this, scan}))
         return;
-    }
-    if (in)
+
+    uint32_t amount;
+    BasicComponent* (BasicComponent::*func)(uint8_t);
+    switch (scan)
     {
-        for (uint8_t i = 0; i < wiredInAmount; i++)
-        {
-            BasicComponent* pointer = getWiredIn(i);
-            if (pointer->isWiredOutput(this))
-            {
-                if (outNeed)
-                {
-                    insertIfNotIn(components, pointer);
-                }
-            } else
-            {
-                pointer->getRelatedComponents(components, true, false, false);
-            }
-        }
+        case Input:
+            amount = wiredInAmount;
+            func = &BasicComponent::getWiredIn;
+            break;
+        case Output:
+            amount = wiredOutAmount;
+            func = &BasicComponent::getWiredOut;
+            break;
     }
-    if (out)
+    for (uint32_t i = 0; i < amount; i++)
     {
-        for (uint8_t i = 0; i < wiredOutAmount; i++)
-        {
-            BasicComponent* pointer = getWiredOut(i);
-            pointer->getRelatedComponents(components, true, false, false);
-        }
+        BasicComponent* basicComponent = (this->*func)(i);
+        bool isOut = basicComponent->isWiredOutput(this);
+        if (isOut)
+            insertIfNotIn(connections, Connection{basicComponent, true});
+        else
+            basicComponent->scanComponents(connections, Input);
     }
 }
 
@@ -123,7 +128,7 @@ sf::Vector2<uint8_t> BasicComponent::getFragmentPosition()
 
 void BasicComponent::replacePointer(BasicComponent* from, BasicComponent* to)
 {
-    uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount;
+    uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount;
     for (uint32_t i = 0; i < amount; i++)
         if (pointers[i] == from)
             pointers[i] = to;
@@ -134,10 +139,18 @@ void BasicComponent::fixMove(BasicComponent& old)
     if (old.pointers == nullptr)
         return;
     clonePointersArray();
-    std::vector<BasicComponent*> connectedComponents;
-    getRelatedComponents(connectedComponents, true, true, true);
-    for (uint32_t i = 0; i < connectedComponents.size(); i++)
-        connectedComponents[i]->replacePointer(&old, this);
+    {
+        std::vector<Connection> connections;
+        scanComponents(connections, Input);
+        for (uint32_t i = 0; i < connections.size(); i++)
+            connections[i].component->replacePointer(&old, this);
+    }
+    {
+        std::vector<Connection> connections;
+        scanComponents(connections, Output);
+        for (uint32_t i = 0; i < connections.size(); i++)
+            connections[i].component->replacePointer(&old, this);
+    }
 }
 
 BasicComponent::~BasicComponent()
@@ -145,23 +158,49 @@ BasicComponent::~BasicComponent()
     delete[] pointers;
 }
 
-void BasicComponent::connect(BasicComponent* basicComponent, bool in)
+void BasicComponent::connect(BasicComponent* bc, bool in)
 {
     if (!in)
     {
-        addOutputWire(basicComponent);
-        basicComponent->addInputWire(this);
-        std::vector<BasicComponent*> connected;
-        getRelatedComponents(connected, false, true, false);
-        for (uint32_t i = 1; i < connected.size(); i++)
+        addOutputWire(bc);
+        bc->addInputWire(this);
+        std::vector<Connection> connections;
+        scanComponents(connections, Output);
+        for (uint32_t i = 1; i < connections.size(); i++)
         {
-            addOutputActual(connected[i]);
-            connected[i]->addInputActual(this);
-        };
+            Connection& c = connections[i];
+            if (c.component->isPeg())
+                c.component->addInputActual(this);
+            else
+            {
+                if (!c.isOutput)
+                {
+                    addOutputActual(c.component);
+                    c.component->addInputActual(this);
+
+                }
+            }
+        }
     } else
     {
-        addInputWire(basicComponent);
-        basicComponent->addInputWire(this);
+        addInputWire(bc);
+        bc->addInputWire(this);
+        std::vector<Connection> connections;
+        scanComponents(connections, Input);
+        std::vector<BasicComponent*> ins;
+        std::vector<BasicComponent*> outs;
+        for (auto& connection : connections)
+            if (connection.isOutput)
+                outs.push_back(connection.component);
+            else
+                ins.push_back(connection.component);
+        for (auto& input : ins)
+            for(auto& output : outs)
+            {
+                input->addInputActual(output);
+                if (!input->isPeg())
+                    output->addOutputActual(input);
+            }
     }
 }
 

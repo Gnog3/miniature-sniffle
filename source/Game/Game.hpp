@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <functional>
+#include <iomanip>
 #include "BackgroundBoard/BackgroundBoard.hpp"
 #include "Player/Player.hpp"
 #include "World/World.hpp"

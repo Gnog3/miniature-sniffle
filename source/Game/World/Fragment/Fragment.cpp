@@ -4,6 +4,11 @@
 Fragment::Fragment(sf::Vector2<uint8_t> position)
 {
     componentList = nullptr;
+    if (position.x > 100 || position.y > 100)
+    {
+        int a = 5;
+        int b = 6;
+    }
     this->position = position;
 }
 
@@ -19,9 +24,9 @@ void Fragment::addComponent(Component component, sf::Vector2u position, uint8_t 
     if (componentList != nullptr)
     {
         //TODO: жесткий костыль, переделать нахуй все
-        std::memcpy(newComponentList, componentList, sizeof(BasicComponent) * (componentAmount - 1));
         for (int i = 0; i < componentAmount - 1; i++)
         {
+            std::memcpy(newComponentList + i, componentList + i, sizeof(BasicComponent));
             newComponentList[i].fixMove(componentList[i]);
         }
         delete[] componentList;

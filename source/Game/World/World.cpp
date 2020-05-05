@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "World.hpp"
 
 sf::Vector2i World::getChunk(sf::Vector2i position)
@@ -88,7 +89,79 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
             uint32_t absolute = getAbsolute(sf::Vector2i(x, y));
             if (chunks[absolute] != nullptr)
             {
-                chunks[absolute]->draw(window, playerPosition, scale);
+                sf::Vector2i position(x, y);
+//                sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
+//                rectangleShape.setOutlineColor(sf::Color::Red);
+//                rectangleShape.setFillColor(sf::Color::Transparent);
+//                rectangleShape.setOutlineThickness(-3);
+//                rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
+                sf::Vector2f screenFirst = playerPosition;
+                sf::Vector2f screenSecond = screenFirst + resolution / (float) scale;
+                sf::Vector2f chunkFirst = (sf::Vector2f) position * (float) (11 * 4096);
+                sf::Vector2f chunkSecond = sf::Vector2f(chunkFirst.x + (float) (11 * 4096 - 1),
+                                                        chunkFirst.y + (float) (11 * 4096 - 1));
+                sf::Vector2f intersactionFirst = sf::Vector2f(std::max(screenFirst.x, chunkFirst.x),
+                                                              std::max(screenFirst.y, chunkFirst.y));
+                sf::Vector2f intersactionSecond = sf::Vector2f(std::min(screenSecond.x, chunkSecond.x),
+                                                               std::min(screenSecond.y, chunkSecond.y));
+                intersactionFirst -= chunkFirst;
+                intersactionSecond -= chunkFirst;
+
+                sf::Vector2i firstFragment = Chunk::getFragment((sf::Vector2i) intersactionFirst / 11);
+                sf::Vector2i lastFragment = Chunk::getFragment((sf::Vector2i) intersactionSecond / 11);
+                chunks[absolute]->drawBody(window, playerPosition, scale, firstFragment, lastFragment);
+            }
+        }
+    }
+    for (int y = fromChunk.y; y <= toChunk.y; y++)
+    {
+        for (int x = fromChunk.x; x <= toChunk.x; x++)
+        {
+            uint32_t absolute = getAbsolute(sf::Vector2i(x, y));
+            if (chunks[absolute] != nullptr)
+            {
+                sf::Vector2i position(x, y);
+                sf::Vector2f screenFirst = playerPosition;
+                sf::Vector2f screenSecond = screenFirst + resolution / (float) scale;
+                sf::Vector2f chunkFirst = (sf::Vector2f) position * (float) (11 * 4096);
+                sf::Vector2f chunkSecond = sf::Vector2f(chunkFirst.x + (float) (11 * 4096 - 1),
+                                                        chunkFirst.y + (float) (11 * 4096 - 1));
+                sf::Vector2f intersactionFirst = sf::Vector2f(std::max(screenFirst.x, chunkFirst.x),
+                                                              std::max(screenFirst.y, chunkFirst.y));
+                sf::Vector2f intersactionSecond = sf::Vector2f(std::min(screenSecond.x, chunkSecond.x),
+                                                               std::min(screenSecond.y, chunkSecond.y));
+                intersactionFirst -= chunkFirst;
+                intersactionSecond -= chunkFirst;
+
+                sf::Vector2i firstFragment = Chunk::getFragment((sf::Vector2i) intersactionFirst / 11);
+                sf::Vector2i lastFragment = Chunk::getFragment((sf::Vector2i) intersactionSecond / 11);
+                chunks[absolute]->drawWires(window, playerPosition, scale, firstFragment, lastFragment);
+            }
+        }
+    }
+    for (int y = fromChunk.y; y <= toChunk.y; y++)
+    {
+        for (int x = fromChunk.x; x <= toChunk.x; x++)
+        {
+            uint32_t absolute = getAbsolute(sf::Vector2i(x, y));
+            if (chunks[absolute] != nullptr)
+            {
+                sf::Vector2i position(x, y);
+                sf::Vector2f screenFirst = playerPosition;
+                sf::Vector2f screenSecond = screenFirst + resolution / (float) scale;
+                sf::Vector2f chunkFirst = (sf::Vector2f) position * (float) (11 * 4096);
+                sf::Vector2f chunkSecond = sf::Vector2f(chunkFirst.x + (float) (11 * 4096 - 1),
+                                                        chunkFirst.y + (float) (11 * 4096 - 1));
+                sf::Vector2f intersactionFirst = sf::Vector2f(std::max(screenFirst.x, chunkFirst.x),
+                                                              std::max(screenFirst.y, chunkFirst.y));
+                sf::Vector2f intersactionSecond = sf::Vector2f(std::min(screenSecond.x, chunkSecond.x),
+                                                               std::min(screenSecond.y, chunkSecond.y));
+                intersactionFirst -= chunkFirst;
+                intersactionSecond -= chunkFirst;
+
+                sf::Vector2i firstFragment = Chunk::getFragment((sf::Vector2i) intersactionFirst / 11);
+                sf::Vector2i lastFragment = Chunk::getFragment((sf::Vector2i) intersactionSecond / 11);
+                chunks[absolute]->drawPegs(window, playerPosition, scale, firstFragment, lastFragment);
             }
         }
     }

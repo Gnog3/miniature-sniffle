@@ -1,4 +1,4 @@
-#include <functional>
+
 #include "Game.hpp"
 
 bool Game::isMouseInsideWindow(sf::Vector2i mousePosition)
@@ -18,21 +18,55 @@ sf::Vector2f Game::mouseToCellPosition(sf::Vector2i mousePosition)
 Game::Game()
 {
     //window.setVerticalSyncEnabled(true);
+    //
     //window.setFramerateLimit(120);
     windowResolution = window.getSize();
     deltaTimeClock.restart();
     font.loadFromFile("font.ttf");
 
-    const int a = 16;
+    world.addComponent(Component::Inverter, sf::Vector2i(5, 5), 0);
+    world.addComponent(Component::Inverter, sf::Vector2i(2, 2), 2);
+    world.connect(sf::Vector2i(5, 5), sf::Vector2i(2, 2));
+    world.addComponent(Component::Peg, sf::Vector2i(7, 3), 0);
+    world.addComponent(Component::Peg, sf::Vector2i(9, 3), 0);
+    world.addComponent(Component::Peg, sf::Vector2i(12, 3), 0);
+    world.connect(sf::Vector2i(7, 3), sf::Vector2i(9, 3), true);
+    world.connect(sf::Vector2i(9, 3), sf::Vector2i(12, 3), true);
+    world.addComponent(Component::Inverter, sf::Vector2i(11, 2), 3);
+    world.connect(sf::Vector2i(11, 2), sf::Vector2i(12, 3), true);
+    world.connect(sf::Vector2i(5, 5), sf::Vector2i(7, 3));
+    world.addComponent(Component::Peg, sf::Vector2i(9, 5), 0);
+    world.connect(sf::Vector2i(9, 5), sf::Vector2i(9, 3), true);
+    world.addComponent(Component::Inverter, sf::Vector2i(10, 5), 1);
+    world.connect(sf::Vector2i(10, 5), sf::Vector2i(9, 5), true);
+    world.addComponent(Component::Peg, sf::Vector2i(12, 5), 0);
+    world.connect(sf::Vector2i(10, 5), sf::Vector2i(12, 5));
+    world.connect(sf::Vector2i(12, 5), sf::Vector2i(12, 3), true);
+    world.addComponent(Component::Inverter, sf::Vector2i(3, 10), 1);
+    world.addComponent(Component::Inverter, sf::Vector2i(5, 10), 0);
+    world.addComponent(Component::Inverter, sf::Vector2i(6, 10), 0);
+    world.addComponent(Component::Inverter, sf::Vector2i(7, 10), 0);
+    world.addComponent(Component::Inverter, sf::Vector2i(8, 10), 0);
+    world.addComponent(Component::Inverter, sf::Vector2i(9, 10), 0);
+    world.connect(sf::Vector2i(3, 10), sf::Vector2i(5, 10));
+    world.connect(sf::Vector2i(5, 10), sf::Vector2i(6, 10), true);
+    world.connect(sf::Vector2i(6, 10), sf::Vector2i(7, 10), true);
+    world.connect(sf::Vector2i(7, 10), sf::Vector2i(8, 10), true);
+    world.connect(sf::Vector2i(8, 10), sf::Vector2i(9, 10), true);
+    world.connect(sf::Vector2i(2, 2), sf::Vector2i(7, 3), true);
+    world.addComponent(Component::Inverter, sf::Vector2i(15, 15), 2);
+    world.addComponent(Component::Inverter, sf::Vector2i(20, 15), 2);
+    world.connect(sf::Vector2i(15, 15), sf::Vector2i(20, 15));
+    world.connect(sf::Vector2i(20, 15), sf::Vector2i(15, 15));
+    world.addComponent(Component::Inverter, sf::Vector2i(20, 18), 0);
+    world.addComponent(Component::Peg, sf::Vector2i(10, 10), 0);
+    world.connect(sf::Vector2i(10, 10), sf::Vector2i(9, 10), true);
+    world.connect(sf::Vector2i(10, 10), sf::Vector2i(10, 5), true);
 
-    for (int i = 13; i < a * 2; i += 2)
-    {
-        world.addComponent(Component::Inverter, sf::Vector2i(i, i * 2), 1);
-    }
-    for (int i = 13; i < a * 2 - 2; i += 2)
-    {
-        world.connect(sf::Vector2i(i, i * 2), sf::Vector2i(i + 2, (i + 2) * 2));
-    }
+        
+
+
+
 
 
 
@@ -119,6 +153,7 @@ void Game::update()
 void Game::draw()
 {
     // window.clear();
+    sf::Clock drawClock;
     sf::Vector2f pos = player.getPosition();
     sf::Vector2f posMouse = mouseToCellPosition(sf::Mouse::getPosition(window));
     string positionString = "X:" + to_string(pos.x) + " Y:" + to_string(pos.y) + "\nX:" +
@@ -142,7 +177,7 @@ void Game::draw()
             {
                 BasicComponent* in = basicComponent->getActualIn(i);
                 sf::RectangleShape rectangleShape;
-                rectangleShape.setSize(sf::Vector2f(1, 1));
+                rectangleShape.setSize(sf::Vector2f(2, 1));
                 rectangleShape.setScale(sf::Vector2f(player.getScale(), player.getScale()));
                 sf::Vector2f pos = ((sf::Vector2f) in->getPosition() + (sf::Vector2f) in->getFragmentPosition() * 16.0f) * 11.0f - player.getPosition();
                 rectangleShape.setPosition(pos * (float) player.getScale());
@@ -155,8 +190,8 @@ void Game::draw()
                 sf::RectangleShape rectangleShape;
                 rectangleShape.setSize(sf::Vector2f(1, 1));
                 rectangleShape.setScale(sf::Vector2f(player.getScale(), player.getScale()));
-                sf::Vector2f pos = ((sf::Vector2f) out->getPosition() + (sf::Vector2f) out->getFragmentPosition() * 16.0f) * 11.0f - player.getPosition();
-                rectangleShape.setPosition(pos * (float) player.getScale());
+                sf::Vector2f posit = ((sf::Vector2f) out->getPosition() + (sf::Vector2f) out->getFragmentPosition() * 16.0f) * 11.0f - player.getPosition();
+                rectangleShape.setPosition(posit * (float) player.getScale());
                 rectangleShape.setFillColor(sf::Color::Green);
                 window.draw(rectangleShape);
             }
@@ -167,11 +202,12 @@ void Game::draw()
         rectangleShape.setScale(sf::Vector2f(player.getScale(), player.getScale()));
         rectangleShape.setPosition((worldPosition * 11.0f - player.getPosition()) * (float) player.getScale());
         rectangleShape.setFillColor(sf::Color::White);
-        window.draw(rectangleShape);
+        //window.draw(rectangleShape);
         BasicComponent* basicComponent1 = world.getComponent((sf::Vector2i) worldPosition);
         if (basicComponent1 != nullptr)
             str << "\nBasicComponent:" << basicComponent1 << "\nX:" << worldPosition.x << " Y:" << worldPosition.y << "\nX:" << (int) basicComponent1->getFragmentPosition().x << " Y:" << (int) basicComponent1->getFragmentPosition().y;
     }
+    str << "\nDraw time: " << std::setw(6) << std::setfill('0') << drawClock.getElapsedTime().asMicroseconds();
     sf::Text text(positionString + str.str(), font);
     text.setCharacterSize(18);
     text.setFillColor(sf::Color::White);

@@ -43,7 +43,7 @@ void Chunk::addComponent(Component component, sf::Vector2u position, uint8_t rot
 
 BasicComponent* Chunk::getComponent(sf::Vector2u componentPosition)
 {
-    uint32_t absolute = getAbsolute(componentPosition /  16u);
+    uint32_t absolute = getAbsolute(componentPosition / 16u);
     if (fragments[absolute] == nullptr)
     {
         return nullptr;
@@ -53,29 +53,8 @@ BasicComponent* Chunk::getComponent(sf::Vector2u componentPosition)
     return fragments[absolute]->getComponent((sf::Vector2<uint8_t>) componentPosition);
 }
 
-void Chunk::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale)
+void Chunk::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment)
 {
-    sf::Vector2f resolution = (sf::Vector2f) window->getSize();
-    sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
-    rectangleShape.setOutlineColor(sf::Color::Red);
-    rectangleShape.setFillColor(sf::Color::Transparent);
-    rectangleShape.setOutlineThickness(-3);
-    rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
-    sf::Vector2f screenFirst = playerPosition;
-    sf::Vector2f screenSecond = screenFirst + resolution / (float) scale;
-    sf::Vector2f chunkFirst = (sf::Vector2f) position * (float) (11 * 4096);
-    sf::Vector2f chunkSecond = sf::Vector2f(chunkFirst.x + (float) (11 * 4096 - 1),
-                                            chunkFirst.y + (float) (11 * 4096 - 1));
-    sf::Vector2f intersactionFirst = sf::Vector2f(std::max(screenFirst.x, chunkFirst.x),
-                                                  std::max(screenFirst.y, chunkFirst.y));
-    sf::Vector2f intersactionSecond = sf::Vector2f(std::min(screenSecond.x, chunkSecond.x),
-                                                   std::min(screenSecond.y, chunkSecond.y));
-    intersactionFirst -= chunkFirst;
-    intersactionSecond -= chunkFirst;
-
-    sf::Vector2i firstFragment = getFragment((sf::Vector2i) intersactionFirst / 11);
-    sf::Vector2i lastFragment = getFragment((sf::Vector2i) intersactionSecond / 11);
-
     for (int y = firstFragment.y; y <= lastFragment.y; ++y)
     {
         for (int x = firstFragment.x; x <= lastFragment.x; ++x)
@@ -88,6 +67,14 @@ void Chunk::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
             }
         }
     }
+
+
+
+    //window->draw(rectangleShape);
+}
+
+void Chunk::drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment)
+{
     for (int y = firstFragment.y; y <= lastFragment.y; ++y)
     {
         for (int x = firstFragment.x; x <= lastFragment.x; ++x)
@@ -100,6 +87,10 @@ void Chunk::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
             }
         }
     }
+}
+
+void Chunk::drawPegs(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment)
+{
     for (int y = firstFragment.y; y <= lastFragment.y; ++y)
     {
         for (int x = firstFragment.x; x <= lastFragment.x; ++x)
@@ -112,5 +103,4 @@ void Chunk::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
             }
         }
     }
-    //window->draw(rectangleShape);
 }

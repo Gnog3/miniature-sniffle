@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <vector>
 #include <cstring>
+#include <iostream>
+#include <functional>
 #include <SFML/Graphics.hpp>
 #include "Component.hpp"
 #include "sfLine/sfLine.hpp"
@@ -16,6 +18,20 @@
  *  Actual Inputs
  *  Actual Outputs
  */
+class BasicComponent;
+
+struct Connection
+{
+    BasicComponent* component;
+    bool isOutput;
+};
+
+enum Scan : bool
+{
+    Input = false,
+    Output = true
+};
+
 class BasicComponent
 {
     protected:
@@ -24,9 +40,9 @@ class BasicComponent
         uint8_t wiredInAmount = 0; // 1 byte
         uint8_t wiredOutAmount = 0; // 1 byte
         uint16_t actualInAmount = 0; // 2 bytes
-        uint16_t actualOutAmount = 0;
+        uint16_t actualOutAmount = 0; // 2 bytes
         BasicComponent** pointers = nullptr; // 8 bytes
-        sf::Vector2<uint8_t> fragmentPosition;
+        sf::Vector2<uint8_t> fragmentPosition; // 2 bytes
 
         void insertPointer(BasicComponent* basicComponent, uint32_t offset);
 
@@ -38,7 +54,7 @@ class BasicComponent
 
         void addOutputActual(BasicComponent* basicComponent);
 
-        static bool insertIfNotIn(std::vector<BasicComponent*>& components, BasicComponent* basicComponent);
+        static bool insertIfNotIn(std::vector<Connection>& connections, Connection connection);
 
 
     public:
@@ -50,7 +66,7 @@ class BasicComponent
 
         void clonePointersArray();
 
-        void getRelatedComponents(std::vector<BasicComponent*>& components, bool in, bool out, bool outNeed);
+        void scanComponents(std::vector<Connection>& connections, Scan scan);
 
         sf::Vector2<uint8_t> getFragmentPosition();
 
