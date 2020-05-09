@@ -54,5 +54,73 @@ sf::Vector2f Player::getPosition()
     return position;
 }
 
+void Player::setComponent(Component component)
+{
+    selectedComponent = component;
+}
+
+Component Player::getActiveComponent()
+{
+    return selectedComponent;
+}
+
+void Player::setRotation(Rotation rotation)
+{
+    selectedRotation = rotation;
+}
+
+Rotation Player::getRotation()
+{
+    return selectedRotation;
+}
+
+Rotation Player::rotate(Rotation rotation)
+{
+    switch (rotation)
+    {
+        case Up:
+            return Right;
+            break;
+        case Right:
+            return Down;
+            break;
+        case Down:
+            return Left;
+            break;
+        case Left:
+            return Up;
+            break;
+    }
+}
+
+void Player::rotate()
+{
+    switch (selectedRotation)
+    {
+        case Up:
+            selectedRotation = Right;
+            break;
+        case Right:
+            selectedRotation = Down;
+            break;
+        case Down:
+            selectedRotation = Left;
+            break;
+        case Left:
+            selectedRotation = Up;
+            break;
+    }
+}
+
+PlayerState Player::getState()
+{
+    return state;
+}
+
+void Player::setState(PlayerState state)
+{
+    this->state = state;
+}
+
 
 #pragma clang diagnostic pop

@@ -1,10 +1,13 @@
 #ifndef GAME_COMPONENT_HPP
 #define GAME_COMPONENT_HPP
 
-enum Component : uint8_t {
+enum Component : uint8_t
+{
+    Nothing,
     Inverter,
     Blotter,
-    Peg
+    Peg,
+    AMOUNT
 };
 
 #endif //GAME_COMPONENT_HPP

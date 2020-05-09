@@ -70,7 +70,8 @@ bool BasicComponent::insertIfNotIn(std::vector<Connection>& connections, Connect
 {
     for (uint32_t i = 0; i < connections.size(); i++)
         if (connections[i].component == connection.component &&
-            connections[i].isOutput == connection.isOutput)
+            connections[i].isOutput == connection.isOutput
+                )
             return false;
     connections.push_back(connection);
     return true;
@@ -92,11 +93,11 @@ void BasicComponent::clonePointersArray()
     pointers = newPointers; // no delete because костыль
 }
 
-void BasicComponent::scanComponents(std::vector<Connection>& connections, Scan scan)
+void BasicComponent::scanComponents(std::vector<Connection>& connections, Scan scan, bool first)
 {
     if (!insertIfNotIn(connections, Connection{this, scan}))
         return;
-
+    
     uint32_t amount;
     BasicComponent* (BasicComponent::*func)(uint8_t);
     switch (scan)
@@ -114,10 +115,10 @@ void BasicComponent::scanComponents(std::vector<Connection>& connections, Scan s
     {
         BasicComponent* basicComponent = (this->*func)(i);
         bool isOut = basicComponent->isWiredOutput(this);
-        if (isOut)
+        if (isOut && !first)
             insertIfNotIn(connections, Connection{basicComponent, true});
         else
-            basicComponent->scanComponents(connections, Input);
+            basicComponent->scanComponents(connections, Input, false);
     }
 }
 
@@ -141,13 +142,13 @@ void BasicComponent::fixMove(BasicComponent& old)
     clonePointersArray();
     {
         std::vector<Connection> connections;
-        scanComponents(connections, Input);
+        scanComponents(connections, Input, false);
         for (uint32_t i = 0; i < connections.size(); i++)
             connections[i].component->replacePointer(&old, this);
     }
     {
         std::vector<Connection> connections;
-        scanComponents(connections, Output);
+        scanComponents(connections, Output, false);
         for (uint32_t i = 0; i < connections.size(); i++)
             connections[i].component->replacePointer(&old, this);
     }
@@ -165,7 +166,7 @@ void BasicComponent::connect(BasicComponent* bc, bool in)
         addOutputWire(bc);
         bc->addInputWire(this);
         std::vector<Connection> connections;
-        scanComponents(connections, Output);
+        scanComponents(connections, Output, true);
         for (uint32_t i = 1; i < connections.size(); i++)
         {
             Connection& c = connections[i];
@@ -177,7 +178,6 @@ void BasicComponent::connect(BasicComponent* bc, bool in)
                 {
                     addOutputActual(c.component);
                     c.component->addInputActual(this);
-
                 }
             }
         }
@@ -186,7 +186,7 @@ void BasicComponent::connect(BasicComponent* bc, bool in)
         addInputWire(bc);
         bc->addInputWire(this);
         std::vector<Connection> connections;
-        scanComponents(connections, Input);
+        scanComponents(connections, Input, false);
         std::vector<BasicComponent*> ins;
         std::vector<BasicComponent*> outs;
         for (auto& connection : connections)
@@ -195,7 +195,7 @@ void BasicComponent::connect(BasicComponent* bc, bool in)
             else
                 ins.push_back(connection.component);
         for (auto& input : ins)
-            for(auto& output : outs)
+            for (auto& output : outs)
             {
                 input->addInputActual(output);
                 if (!input->isPeg())
@@ -207,6 +207,11 @@ void BasicComponent::connect(BasicComponent* bc, bool in)
 sf::Vector2<uint8_t> BasicComponent::getPosition() const
 {
     return sf::Vector2<uint8_t>((uint8_t) 0b1111 & position, (uint8_t) ((uint8_t) 0b11110000 & position) >> (uint8_t) 4);
+}
+
+bool BasicComponent::getOutputState()
+{
+    return data & 0b1000u;
 }
 
 BasicComponent* BasicComponent::getWiredIn(uint8_t index)
@@ -249,6 +254,16 @@ uint16_t BasicComponent::getActualOutAmount() const
     return actualOutAmount;
 }
 
+Rotation BasicComponent::getRotation() const
+{
+    return Rotation (data & 0b11u);
+}
+
+void BasicComponent::setRotation(Rotation rotation)
+{
+    data = (data & 0b11111100u) | rotation;
+}
+
 void BasicComponent::setWiredInAmount(uint8_t value)
 {
     wiredInAmount = value;
@@ -262,6 +277,26 @@ void BasicComponent::setWiredOutAmount(uint8_t value)
 void BasicComponent::setActualInAmount(uint16_t value)
 {
     actualInAmount = value;
+}
+
+void BasicComponent::drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f position, uint8_t scale, Rotation rotation)
+{
+    sf::Texture texture;
+    sf::Texture texture1;
+    sf::Sprite bodySprite = getBodySprite(&texture);
+    sf::Sprite pegsSprite = getPegsSprite(&texture1, sf::Color::Black, sf::Color::Black);
+    
+    bodySprite.setScale(sf::Vector2f(scale, scale));
+    pegsSprite.setScale(sf::Vector2f(scale, scale));
+    sf::Vector2f origin = sf::Vector2f(5.5f, 5.5f) - bodySprite.getOrigin();
+    bodySprite.setPosition(position + sf::Vector2f(5.5f, 5.5f) * (float) scale);
+    pegsSprite.setPosition(position + sf::Vector2f(5.5f, 5.5f) * (float) scale);
+    bodySprite.setColor(sf::Color(255, 255, 255, 100));
+    pegsSprite.setColor(sf::Color(255, 255, 255, 100));
+    bodySprite.setRotation((float) rotation * 90);
+    pegsSprite.setRotation((float) rotation * 90);
+    window->draw(bodySprite);
+    window->draw(pegsSprite);
 }
 
 bool BasicComponent::isPeg()
@@ -287,7 +322,7 @@ void BasicComponent::drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPo
     for (uint8_t i = 0; i < wiredOutAmount; i++)
     {
         sf::Vector2i fragmentDifference = (sf::Vector2i) (getWiredOut(i)->getFragmentPosition() - this->fragmentPosition);
-
+        
         fragmentDifference.x = fragmentDifference.x > 128 ? fragmentDifference.x - 256 : fragmentDifference.x;
         fragmentDifference.x = fragmentDifference.x <= -128 ? fragmentDifference.x + 256 : fragmentDifference.x;
         fragmentDifference.y = fragmentDifference.y > 128 ? fragmentDifference.y - 256 : fragmentDifference.y;
@@ -351,6 +386,21 @@ sf::Vector2f BasicComponent::getOutputPoint()
     return sf::Vector2f();
 }
 
+sf::IntRect BasicComponent::getBodyRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect();
+}
+
+sf::IntRect BasicComponent::getInputRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect();
+}
+
+sf::IntRect BasicComponent::getOutputRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect();
+}
+
 sf::Sprite BasicComponent::getBodySprite(sf::Texture* texture)
 {
     return sf::Sprite();
@@ -362,8 +412,6 @@ sf::Sprite BasicComponent::getPegsSprite(sf::Texture* texture, sf::Color in, sf:
 }
 
 void BasicComponent::update()
-{
-
-}
+{}
 
 #pragma clang diagnostic pop

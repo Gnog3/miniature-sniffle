@@ -26,7 +26,7 @@ Chunk::Chunk(sf::Vector2<int8_t> position)
     }
 }
 
-void Chunk::addComponent(Component component, sf::Vector2u position, uint8_t rotation)
+void Chunk::addComponent(Component component, sf::Vector2u position, Rotation rotation)
 {
     sf::Vector2u fragment = position / (uint32_t) 16;
     uint32_t absolute = getAbsolute(fragment);
@@ -39,6 +39,11 @@ void Chunk::addComponent(Component component, sf::Vector2u position, uint8_t rot
     position.y %= 16;
     fragments[absolute]->addComponent(component, position, rotation);
 
+}
+
+Fragment* Chunk::getFragment(sf::Vector2u fragment)
+{
+    return fragments[getAbsolute((sf::Vector2u) getFragment((sf::Vector2i) fragment))];
 }
 
 BasicComponent* Chunk::getComponent(sf::Vector2u componentPosition)

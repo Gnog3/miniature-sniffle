@@ -37,7 +37,7 @@ sf::Vector2u World::handlePosition(sf::Vector2i position)
     return (sf::Vector2u) position;
 }
 
-void World::addComponent(Component component, sf::Vector2i position, uint8_t rotation)
+void World::addComponent(Component component, sf::Vector2i position, Rotation rotation)
 {
     sf::Vector2i chunk = getChunk(position);
 
@@ -49,6 +49,14 @@ void World::addComponent(Component component, sf::Vector2i position, uint8_t rot
     }
 
     chunks[absolute]->addComponent(component, handlePosition(position), rotation);
+}
+
+Fragment* World::getFragmentFromPoint(sf::Vector2i point)
+{
+    uint32_t absolute = getAbsolute(getChunk(point));
+    if (chunks[absolute] == nullptr)
+        return nullptr;
+    chunks[getAbsolute(getChunk(point))]->getFragment(handlePosition(point));
 }
 
 BasicComponent* World::getComponent(sf::Vector2i componentPosition)

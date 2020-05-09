@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "modernize-use-auto"
 
 #include "Inverter.hpp" // in out
 
@@ -55,6 +57,9 @@ sf::Sprite Inverter::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color
     return sprite;
 }
 
+Inverter::Inverter() : BasicComponent()
+{}
+
 Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation) : BasicComponent(Component::Inverter, position, fragmentPosition, rotation)
 {}
 
@@ -69,6 +74,37 @@ sf::Vector2f Inverter::getOutputPoint()
 {
     uint8_t rotation = data & 0b11u;
     return getInputPoint() + sf::Vector2f(rotation % 2 ? 8.f * (float) (2 - rotation) : 0, rotation % 2 ? 0 : 8.f * (float) (rotation - 1));
+}
+
+sf::IntRect Inverter::getBodyRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect(componentPosition.x, componentPosition.y, 11, 11);
+}
+
+sf::IntRect Inverter::getInputRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect(componentPosition.x + 4, componentPosition.y + 4, 3, 3);
+}
+
+sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
+{
+    Rotation rotation = Rotation (data & 0b11u);
+    switch (rotation)
+    {
+        case Up:
+            return sf::IntRect(componentPosition.x + 3, componentPosition.y - 3, 5, 3);
+            break;
+        case Right:
+            return sf::IntRect(componentPosition.x + 11, componentPosition.y + 3, 3, 5);
+            break;
+        case Down:
+            return sf::IntRect(componentPosition.x + 3, componentPosition.y + 11, 5, 3);
+            break;
+        case Left:
+            return sf::IntRect(componentPosition.x - 3, componentPosition.y + 3, 3, 5);
+            break;
+    }
+    
 }
 
 void Inverter::update()
@@ -106,3 +142,4 @@ void Inverter::drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition,
     window->draw(sprite[state]);
 }
 
+#pragma clang diagnostic pop

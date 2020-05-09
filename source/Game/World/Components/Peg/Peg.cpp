@@ -48,6 +48,9 @@ sf::Sprite Peg::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out)
     return sprite;
 }
 
+Peg::Peg() : BasicComponent()
+{}
+
 Peg::Peg(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition) : BasicComponent(Component::Inverter, position, fragmentPosition, 0)
 {}
 
@@ -65,6 +68,21 @@ sf::Vector2f Peg::getOutputPoint()
 {
     uint8_t rotation = data & 0b11u;
     return getInputPoint() + sf::Vector2f(rotation % 2 ? 8.f * (float) (2 - rotation) : 0, rotation % 2 ? 0 : 8.f * (float) (rotation - 1));
+}
+
+sf::IntRect Peg::getBodyRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect(componentPosition.x + 2, componentPosition.y + 2, 9, 9);
+}
+
+sf::IntRect Peg::getInputRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect(componentPosition.x + 4, componentPosition.y + 4, 3, 3);
+}
+
+sf::IntRect Peg::getOutputRectangle(sf::Vector2i componentPosition)
+{
+    return sf::IntRect();
 }
 
 void Peg::drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)

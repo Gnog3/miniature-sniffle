@@ -17,13 +17,18 @@ Fragment::~Fragment()
 
 }
 
-void Fragment::addComponent(Component component, sf::Vector2u position, uint8_t rotation)
+uint16_t Fragment::getComponentAmount()
+{
+    return componentAmount;
+}
+
+void Fragment::addComponent(Component component, sf::Vector2u position, Rotation rotation)
 {
     componentAmount++;
     BasicComponent* newComponentList = new BasicComponent[componentAmount];
     if (componentList != nullptr)
     {
-        //TODO: жесткий костыль, переделать нахуй все
+        //TODO: жесткий костыль, переделать нафиг все
         for (int i = 0; i < componentAmount - 1; i++)
         {
             std::memcpy(newComponentList + i, componentList + i, sizeof(BasicComponent));
@@ -59,16 +64,21 @@ BasicComponent* Fragment::getComponent(sf::Vector2<uint8_t> position)
     return nullptr;
 }
 
+BasicComponent* Fragment::getComponent(uint16_t id)
+{
+    return &componentList[id];
+}
+
 void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)
 {
-//    sf::RectangleShape rectangleShape(sf::Vector2f((16 * 11) * scale - 2, (16 * 11) * scale - 2));
-//    rectangleShape.setOutlineColor(sf::Color::Blue);
-//    rectangleShape.setFillColor(sf::Color::Transparent);
-//    rectangleShape.setOutlineThickness(-3);
-//    rectangleShape.setPosition(
-//            ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
-//            chunkPosition);
-//
+    sf::RectangleShape rectangleShape(sf::Vector2f((16 * 11) * scale - 2, (16 * 11) * scale - 2));
+    rectangleShape.setOutlineColor(sf::Color::Blue);
+    rectangleShape.setFillColor(sf::Color::Transparent);
+    rectangleShape.setOutlineThickness(-3);
+    rectangleShape.setPosition(
+            ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
+            chunkPosition);
+
     sf::Vector2f fragmentPosition = ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + chunkPosition;
 
     for (int i = 0; i < componentAmount; i++)
@@ -76,7 +86,7 @@ void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, s
         componentList[i].drawBody(window, fragmentPosition, scale);
     }
 
-//    window->draw(rectangleShape);
+    window->draw(rectangleShape);
 }
 
 void Fragment::drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)

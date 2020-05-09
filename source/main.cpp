@@ -27,7 +27,6 @@ int main()
         {
             game.handleEvent(event);
         }
-        
         game.update();
         game.draw();
     }
