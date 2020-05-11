@@ -109,6 +109,8 @@ void Game::handleEvent(sf::Event& event)
                     player.setComponent(Component::Inverter);
                 else if (event.key.code == sf::Keyboard::Num3)
                     player.setComponent(Component::Peg);
+//                else if (event.key.code == sf::Keyboard::U)
+//                    world.fullTick();
                 else
                     ret = false;
                 if (ret)
@@ -137,6 +139,7 @@ void Game::update()
             player.stopDragging();
     } else
         player.stopDragging();
+    world.fullTick();
     float deltaTime = deltaTimeClock.restart().asSeconds();
     fps = 1 / deltaTime;
 }

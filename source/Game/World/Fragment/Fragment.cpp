@@ -29,7 +29,7 @@ void Fragment::addComponent(Component component, sf::Vector2u position, Rotation
     if (componentList != nullptr)
     {
         //TODO: жесткий костыль, переделать нафиг все
-        for (int i = 0; i < componentAmount - 1; i++)
+        for (uint16_t i = 0; i < componentAmount - 1; i++)
         {
             std::memcpy(newComponentList + i, componentList + i, sizeof(BasicComponent));
             newComponentList[i].fixMove(componentList[i]);
@@ -37,8 +37,8 @@ void Fragment::addComponent(Component component, sf::Vector2u position, Rotation
         delete[] componentList;
     }
     componentList = newComponentList;
-
-
+    
+    
     switch (component)
     {
         case Component::Inverter:
@@ -50,6 +50,37 @@ void Fragment::addComponent(Component component, sf::Vector2u position, Rotation
         case Component::Peg:
             new(&componentList[componentAmount - 1]) class Peg((sf::Vector2<uint8_t>) position, this->position);
             break;
+    }
+}
+
+bool Fragment::removeComponent(sf::Vector2u position)
+{
+    componentAmount--;
+    if (componentAmount > 0)
+    {
+        BasicComponent* newComponentList = new BasicComponent[componentAmount];
+        
+        bool found = false;
+        for (uint16_t i = 0; i < componentAmount + 1; i++)
+        {
+            if (!found && (sf::Vector2<uint8_t>) position == componentList[i].getPosition())
+            {
+                found = true;
+                componentList[i].disconnectAll();
+                continue;
+            }
+            std::memcpy(newComponentList + i - (found ? 1 : 0), componentList + i, sizeof(BasicComponent));
+            newComponentList[i - (found ? 1 : 0)].fixMove(componentList[i]);
+        }
+        delete[] componentList;
+        componentList = newComponentList;
+        return false;
+    } else
+    {
+        componentList[0].disconnectAll();
+        delete[] componentList;
+        componentList = nullptr;
+        return true;
     }
 }
 
@@ -69,6 +100,30 @@ BasicComponent* Fragment::getComponent(uint16_t id)
     return &componentList[id];
 }
 
+void Fragment::calculateInputs()
+{
+    for (uint16_t i = 0; i < componentAmount; i++)
+    {
+        componentList[i].calculateInput();
+    }
+}
+
+void Fragment::fullTick()
+{
+    for (uint16_t i = 0; i < componentAmount; i++)
+    {
+        componentList[i].update();
+    }
+}
+
+void Fragment::shiftState()
+{
+    for (uint16_t i = 0; i < componentAmount; i++)
+    {
+        componentList[i].shiftState();
+    }
+}
+
 void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)
 {
     sf::RectangleShape rectangleShape(sf::Vector2f((16 * 11) * scale - 2, (16 * 11) * scale - 2));
@@ -78,14 +133,14 @@ void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, s
     rectangleShape.setPosition(
             ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
             chunkPosition);
-
+    
     sf::Vector2f fragmentPosition = ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + chunkPosition;
-
+    
     for (int i = 0; i < componentAmount; i++)
     {
         componentList[i].drawBody(window, fragmentPosition, scale);
     }
-
+    
     window->draw(rectangleShape);
 }
 

@@ -61,7 +61,9 @@ Inverter::Inverter() : BasicComponent()
 {}
 
 Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation) : BasicComponent(Component::Inverter, position, fragmentPosition, rotation)
-{}
+{
+    data |= 0b1000u;
+}
 
 sf::Vector2f Inverter::getInputPoint()
 {
@@ -106,6 +108,7 @@ sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
 
 void Inverter::update()
 {
+    setNextState(!getInput());
 }
 
 void Inverter::drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)
@@ -131,7 +134,6 @@ void Inverter::drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition,
     };
     uint16_t rotation = (0b11u & data) * 90;
     uint8_t state = (0b11000u & data) >> 3u;
-    state += 1;
     sf::Vector2f position = sf::Vector2f(0b1111u & this->position, (0b11110000u & this->position) >> 4u) * 11.0f;
     sprite[state].setRotation(rotation);
     sprite[state].setScale(sf::Vector2f(scale, scale));

@@ -109,7 +109,7 @@ void Peg::drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uin
         sf::Vector2f first = (getWiredIn(i)->isWiredOutput(this) ? getWiredIn(i)->getOutputPoint() : getWiredIn(i)->getInputPoint()) * (float) scale + fragmentPosition;
         first += (sf::Vector2f) (fragmentDifference * 16 * 11 * (int) scale);
         sf::Vector2f second = getInputPoint() * (float) scale + fragmentPosition;
-        sfLine sfline(first, second, sf::Color::Red, scale);
+        sfLine sfline(first, second, getInput() ? sf::Color::Red : sf::Color::Black, scale);
         sfline.draw(*window);
     }
 }

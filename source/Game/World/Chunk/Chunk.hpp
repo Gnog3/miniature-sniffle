@@ -1,6 +1,6 @@
 #ifndef GAME_CHUNK_HPP
 #define GAME_CHUNK_HPP
-
+#define CHUNK_SIZE 256 * 256
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 #include <algorithm>
@@ -13,8 +13,8 @@
 class Chunk
 {
     private:
-        static const int CHUNK_SIZE = 256 * 256;
         Fragment* fragments[CHUNK_SIZE];
+        uint32_t active = 0;
         sf::Vector2<int8_t> position;
     public:
         static uint32_t getAbsolute(sf::Vector2u fragment);
@@ -22,8 +22,12 @@ class Chunk
         static sf::Vector2i getFragment(sf::Vector2i position);
         Chunk(sf::Vector2<int8_t> position);
         void addComponent(Component component, sf::Vector2u position, Rotation rotation);
+        bool removeComponent(sf::Vector2u position);
         Fragment* getFragment(sf::Vector2u fragment);
         BasicComponent* getComponent(sf::Vector2u componentPosition);
+        void calculateInputs();
+        void fullTick();
+        void shiftState();
         void drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment);
         void drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment);
         void drawPegs(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment);

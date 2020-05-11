@@ -118,6 +118,18 @@ bool Interaction::handleNewComponentTry(Game& game)
     return true;
 }
 
+bool Interaction::handleRemoveComponentTry(Game& game)
+{
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(game.window);
+    sf::Vector2f mouseCellPosition = game.mouseToCellPosition(mousePosition);
+    sf::Vector2i cell(std::floor(mouseCellPosition.x / 11), std::floor(mouseCellPosition.y / 11));
+    BasicComponent* component = game.world.getComponent(cell);
+    if (component == nullptr)
+        return false;
+    game.world.removeComponent(cell);
+    return true;
+}
+
 bool Interaction::isConnecting(Game& game)
 {
     return game.player.getState() == WireDrawFromOutput ||
@@ -161,6 +173,11 @@ bool Interaction::handleEvent(Game& game, sf::Event& event)
                     return true;
             }
         }
+        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::T)
+        {
+            if (handleRemoveComponentTry(game))
+                return true;
+        }
     }
     return false;
 }
@@ -181,6 +198,3 @@ bool Interaction::update(Game& game)
     }
     return false;
 }
-
-
-

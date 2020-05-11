@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "modernize-use-nodiscard"
 #ifndef GAME_BASICCOMPONENT_HPP
 #define GAME_BASICCOMPONENT_HPP
 
@@ -37,7 +39,7 @@ class BasicComponent
 {
     protected:
         uint8_t position = 0; // 1 byte
-        uint8_t data = 0; // 1 byte (4 bits in use) // 4 bits nothing / currentOut / nextOut / rotation rotation
+        uint8_t data = 0; // 1 byte (3 bits in use) // 3 bit nothing / currentIn (calculates before update) / currentOut / nextOut / rotation rotation
         uint8_t wiredInAmount = 0; // 1 byte
         uint8_t wiredOutAmount = 0; // 1 byte
         uint16_t actualInAmount = 0; // 2 bytes
@@ -56,8 +58,6 @@ class BasicComponent
         void removeInputActual(BasicComponent* basicComponent);
         void removeOutputActual(BasicComponent* basicComponent);
         static bool insertIfNotIn(std::vector<Connection>& connections, Connection connection);
-        void clearActualIn();
-        void clearActualOut();
     public:
         bool isWiredOutput(BasicComponent* basicComponent);
         BasicComponent() = default;
@@ -68,16 +68,20 @@ class BasicComponent
         void replacePointer(BasicComponent* from, BasicComponent* to);
         void fixMove(BasicComponent& old);
         ~BasicComponent();
-        void recalculateActuals();
         void connect(BasicComponent* basicComponent, bool in);
         void disconnect(BasicComponent* bc, bool in);
+        void disconnectAll();
         sf::Vector2<uint8_t> getPosition() const;
-        bool getOutputState();
+        void calculateInput();
+        bool getCurrentState() const;
+        bool getInput() const;
+        void setNextState(bool state);
+        void shiftState();
         bool isConnected(BasicComponent* bc, bool in);
-        BasicComponent* getWiredIn(uint8_t index);
-        BasicComponent* getWiredOut(uint8_t index);
-        BasicComponent* getActualIn(uint16_t index);
-        BasicComponent* getActualOut(uint16_t index);
+        BasicComponent* getWiredIn(uint8_t index) const;
+        BasicComponent* getWiredOut(uint8_t index) const;
+        BasicComponent* getActualIn(uint16_t index) const;
+        BasicComponent* getActualOut(uint16_t index) const;
         uint8_t getWiredInAmount() const;
         uint8_t getWiredOutAmount() const;
         uint16_t getActualInAmount() const;
@@ -104,3 +108,5 @@ class BasicComponent
 
 
 #endif //GAME_BASICCOMPONENT_HPP
+
+#pragma clang diagnostic pop

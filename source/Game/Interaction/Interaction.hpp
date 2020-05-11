@@ -16,6 +16,7 @@ class Interaction
         
         bool handleConnectionTry(Game& game);
         static bool handleNewComponentTry(Game& game);
+        static bool handleRemoveComponentTry(Game& game);
     public:
         static bool isConnecting(Game& game);
         sf::Vector2f getStartConnectionPoint();

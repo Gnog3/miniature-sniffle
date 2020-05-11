@@ -28,17 +28,35 @@ Chunk::Chunk(sf::Vector2<int8_t> position)
 
 void Chunk::addComponent(Component component, sf::Vector2u position, Rotation rotation)
 {
-    sf::Vector2u fragment = position / (uint32_t) 16;
+    sf::Vector2u fragment = position / 16u;
     uint32_t absolute = getAbsolute(fragment);
     if (fragments[absolute] == nullptr)
     {
         fragments[absolute] = new Fragment(sf::Vector2<uint8_t>(fragment));
+        active++;
     }
-
+    
     position.x %= 16;
     position.y %= 16;
     fragments[absolute]->addComponent(component, position, rotation);
+    
+}
 
+bool Chunk::removeComponent(sf::Vector2u position)
+{
+    sf::Vector2u fragment = position / 16u;
+    uint32_t absolute = getAbsolute(fragment);
+    position.x %= 16;
+    position.y %= 16;
+    bool isEmpty = fragments[absolute]->removeComponent(position);
+    if (isEmpty)
+    {
+        active--;
+        delete fragments[absolute];
+        fragments[absolute] = nullptr;
+        return active == 0;
+    }
+    return false;
 }
 
 Fragment* Chunk::getFragment(sf::Vector2u fragment)
@@ -58,6 +76,33 @@ BasicComponent* Chunk::getComponent(sf::Vector2u componentPosition)
     return fragments[absolute]->getComponent((sf::Vector2<uint8_t>) componentPosition);
 }
 
+void Chunk::calculateInputs()
+{
+    for (auto& fragment : fragments)
+    {
+        if (fragment != nullptr)
+            fragment->calculateInputs();
+    }
+}
+
+void Chunk::fullTick()
+{
+    for (auto& fragment : fragments)
+    {
+        if (fragment != nullptr)
+            fragment->fullTick();
+    }
+}
+
+void Chunk::shiftState()
+{
+    for (auto& fragment : fragments)
+    {
+        if (fragment != nullptr)
+            fragment->shiftState();
+    }
+}
+
 void Chunk::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment)
 {
     for (int y = firstFragment.y; y <= lastFragment.y; ++y)
@@ -72,9 +117,9 @@ void Chunk::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, uint
             }
         }
     }
-
-
-
+    
+    
+    
     //window->draw(rectangleShape);
 }
 

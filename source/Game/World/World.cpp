@@ -40,15 +40,28 @@ sf::Vector2u World::handlePosition(sf::Vector2i position)
 void World::addComponent(Component component, sf::Vector2i position, Rotation rotation)
 {
     sf::Vector2i chunk = getChunk(position);
-    
     uint32_t absolute = getAbsolute(chunk);
-    
     if (chunks[absolute] == nullptr)
     {
         chunks[absolute] = new Chunk((sf::Vector2<int8_t>) chunk);
     }
     
     chunks[absolute]->addComponent(component, handlePosition(position), rotation);
+}
+
+void World::removeComponent(sf::Vector2i position)
+{
+    sf::Vector2i chunk = getChunk(position);
+    
+    uint32_t absolute = getAbsolute(chunk);
+    
+    bool isEmpty = chunks[absolute]->removeComponent(handlePosition(position));
+    
+    if (isEmpty)
+    {
+        delete chunks[absolute];
+        chunks[absolute] = nullptr;
+    }
 }
 
 Fragment* World::getFragmentFromPoint(sf::Vector2i point)
@@ -93,9 +106,23 @@ bool World::isConnected(sf::Vector2i from, sf::Vector2i to, bool in)
     return first->isConnected(second, in);
 }
 
-void World::doTick()
+void World::fullTick()
 {
-
+    for (auto & chunk : chunks)
+    {
+        if (chunk != nullptr)
+            chunk->calculateInputs();
+    }
+    for (auto & chunk : chunks)
+    {
+        if (chunk != nullptr)
+            chunk->fullTick();
+    }
+    for (auto & chunk : chunks)
+    {
+        if (chunk != nullptr)
+            chunk->shiftState();
+    }
 }
 
 void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale)
@@ -114,11 +141,12 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
             if (chunks[absolute] != nullptr)
             {
                 sf::Vector2i position(x, y);
-//                sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
-//                rectangleShape.setOutlineColor(sf::Color::Red);
-//                rectangleShape.setFillColor(sf::Color::Transparent);
-//                rectangleShape.setOutlineThickness(-3);
-//                rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
+                sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
+                rectangleShape.setOutlineColor(sf::Color::Red);
+                rectangleShape.setFillColor(sf::Color::Transparent);
+                rectangleShape.setOutlineThickness(-3);
+                rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
+                window->draw(rectangleShape);
                 sf::Vector2f screenFirst = playerPosition;
                 sf::Vector2f screenSecond = screenFirst + resolution / (float) scale;
                 sf::Vector2f chunkFirst = (sf::Vector2f) position * (float) (11 * 4096);
