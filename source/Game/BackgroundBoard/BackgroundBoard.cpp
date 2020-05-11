@@ -14,8 +14,7 @@ uint8_t* BackgroundBoard::getColorArray(sf::Color background, sf::Color foregrou
                 array[pointer + 1] = foreground.g;
                 array[pointer + 2] = foreground.b;
                 array[pointer + 3] = foreground.a;
-            }
-            else
+            } else
             {
                 array[pointer + 0] = background.r;
                 array[pointer + 1] = background.g;
@@ -31,24 +30,26 @@ BackgroundBoard::BackgroundBoard(const sf::Vector2u windowResolution, const uint
 {
     const uint8_t backBrightness = 170;
     const uint8_t foreBrightness = 110;
-    const sf::Color background(backBrightness, backBrightness, backBrightness, 255);
-    const sf::Color foreground(foreBrightness, foreBrightness, foreBrightness, 255);
     const uint8_t size = 11;
     const uint8_t thickness = 1;
+    const sf::Color background(backBrightness, backBrightness, backBrightness, 255);
+    const sf::Color foreground(foreBrightness, foreBrightness, foreBrightness, 255);
     uint8_t* array = getColorArray(background, foreground, size, thickness);
     texture.create(size, size);
     texture.update(array);
     texture.setRepeated(true);
     sprite.setTexture(texture);
     sprite.setScale(sf::Vector2f(initScale, initScale));
-    sprite.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(windowResolution.x + size * initScale, windowResolution.y + size * initScale)));
+    sprite.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(windowResolution.x / initScale + size * initScale, windowResolution.y / initScale + size * initScale)));
     delete[] array;
 }
 
-void BackgroundBoard::handleScale(uint8_t scale, sf::Vector2f playerPosition)
+void BackgroundBoard::handleScale(sf::Vector2u windowResolution, uint8_t scale, sf::Vector2f playerPosition)
 {
+    const uint8_t size = 11;
     if (scale >= 1 && scale <= 255)
     {
+        sprite.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(windowResolution.x / scale + size * scale, windowResolution.y / scale + size * scale)));
         sprite.setScale(sf::Vector2f(scale, scale));
         handlePlayerPosition(playerPosition);
     }
@@ -71,7 +72,15 @@ void BackgroundBoard::handlePlayerPosition(sf::Vector2f playerPosition)
     
 }
 
+void BackgroundBoard::handleResolution(sf::Vector2u windowResolution, uint8_t scale)
+{
+    const uint8_t size = 11;
+    sprite.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(windowResolution.x / scale + size * scale, windowResolution.y / scale + size * scale)));
+}
+
 void BackgroundBoard::draw(sf::RenderWindow* window)
 {
     window->draw(sprite);
 }
+
+

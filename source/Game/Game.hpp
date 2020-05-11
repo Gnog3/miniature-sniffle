@@ -25,13 +25,12 @@ class Game
         friend Interaction;
     private:
         sf::String windowLabel = "The Window";
-        sf::Vector2u windowResolution = sf::Vector2u(1600, 900);
-        sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(windowResolution.x, windowResolution.y), windowLabel, sf::Style::Default, sf::ContextSettings(0, 0, 4));
+        sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(800, 600), windowLabel, sf::Style::Default, sf::ContextSettings(0, 0, 4));
         sf::Clock deltaTimeClock;
         sf::Font font;
         BasicComponent shadowComponent[Component::AMOUNT];
         Player player;
-        BackgroundBoard backgroundBoard = BackgroundBoard(windowResolution, player.getScale());
+        BackgroundBoard backgroundBoard = BackgroundBoard(window.getSize(), player.getScale());
         World world;
         Interaction* interaction; // initialization is in constructor
         float fps = 0;

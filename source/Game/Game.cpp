@@ -5,6 +5,7 @@
 
 bool Game::isMouseInsideWindow(sf::Vector2i mousePosition)
 {
+    sf::Vector2u windowResolution = window.getSize();
     return mousePosition.x >= 0 && mousePosition.y >= 0 && mousePosition.x < windowResolution.x &&
            mousePosition.y < windowResolution.y;
 }
@@ -19,6 +20,7 @@ sf::Vector2f Game::mouseToCellPosition(sf::Vector2i mousePosition)
 
 std::string Game::getDrawText()
 {
+    sf::Vector2u windowResolution = window.getSize();
     sf::Vector2f pos = player.getPosition();
     sf::Vector2f posMouse = mouseToCellPosition(sf::Mouse::getPosition(window));
     string positionString = "X:" + to_string(pos.x) + " Y:" + to_string(pos.y) + "\nX:" +
@@ -33,8 +35,8 @@ Game::Game()
 {
     //window.setVerticalSyncEnabled(true);
     interaction = new Interaction;
-    window.setFramerateLimit(120);
-    windowResolution = window.getSize();
+    //window.setFramerateLimit(120);
+    
     deltaTimeClock.restart();
     font.loadFromFile("font.ttf");
     //new(&shadowComponent[Component::Nothing]) class BasicComponent;
@@ -65,7 +67,11 @@ void Game::handleEvent(sf::Event& event)
         window.close();
         return;
     }
-    
+    if (event.type == sf::Event::Resized)
+    {
+        window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
+        backgroundBoard.handleResolution(window.getSize(), player.getScale());
+    }
     if (window.hasFocus())
     {
         if (isMouseInsideWindow(mousePosition))
@@ -89,7 +95,7 @@ void Game::handleEvent(sf::Event& event)
                 sf::Vector2f offset = mousePositionAfter - mousePositionBefore;
                 player.move(-offset);
                 player.setPosition(sf::Vector2f(std::floor(player.getPosition().x * (float) scale) / (float) scale, std::floor(player.getPosition().y * (float) scale) / (float) scale));
-                backgroundBoard.handleScale(scale, player.getPosition());
+                backgroundBoard.handleScale(window.getSize(), scale, player.getPosition());
                 return;
             }
             if (event.type == sf::Event::KeyPressed)
