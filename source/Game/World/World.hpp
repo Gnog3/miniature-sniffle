@@ -27,6 +27,8 @@ class World
         Fragment* getFragmentFromPoint(sf::Vector2i point);
         BasicComponent* getComponent(sf::Vector2i componentPosition);
         void connect(sf::Vector2i from, sf::Vector2i to, bool in = false);
+        void disconnect(sf::Vector2i from, sf::Vector2i to, bool in = false);
+        bool isConnected(sf::Vector2i from, sf::Vector2i to, bool in = false);
         void doTick();
         void draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale);
 };

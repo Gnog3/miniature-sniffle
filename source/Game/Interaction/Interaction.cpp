@@ -6,7 +6,8 @@ bool Interaction::handleConnectionTry(Game& game)
         return false;
     sf::Vector2i mousePosition = sf::Mouse::getPosition(game.window);
     sf::Vector2f mouseCellPosition = game.mouseToCellPosition(mousePosition);
-    sf::Vector2i cell(std::floor(mouseCellPosition.x / 11), std::floor(mouseCellPosition.y / 11));
+    sf::Vector2i cell(std::floor(mouseCellPosition.x / 11.f),
+                      std::floor(mouseCellPosition.y / 11.f));
     bool reset = false;
     for (int32_t y = cell.y - 1; y <= cell.y + 1; y++)
     {
@@ -15,8 +16,10 @@ bool Interaction::handleConnectionTry(Game& game)
             BasicComponent* basicComponent = game.world.getComponent(sf::Vector2i(x, y));
             if (basicComponent == nullptr)
                 continue;
-            sf::IntRect inputRect = basicComponent->getInputRectangle(sf::Vector2i(x, y) * 11);
-            sf::IntRect outputRect = basicComponent->getOutputRectangle(sf::Vector2i(x, y) * 11);
+            sf::IntRect inputRect = basicComponent->getInputRectangle(sf::Vector2i(x, y) * 11 +
+                                                                      sf::Vector2i(x < 0 ? 1 : 0, y < 0 ? 1 : 0)); // Костыль. Не знаю почему, но при минусовой координате оно смещается, так что нужно сместить обратно
+            sf::IntRect outputRect = basicComponent->getOutputRectangle(sf::Vector2i(x, y) * 11 +
+                                                                        sf::Vector2i(x < 0 ? 1 : 0, y < 0 ? 1 : 0)); // ^^
             if (game.player.getState() == Normal)
             {
                 if (inputRect.contains((sf::Vector2i) mouseCellPosition))
@@ -39,24 +42,30 @@ bool Interaction::handleConnectionTry(Game& game)
             {
                 if (inputRect.contains((sf::Vector2i) mouseCellPosition) && basicComponent != connectionComponent)
                 {
-                    game.world.connect(connectionPosition, sf::Vector2i(x, y));
-                    reset = true;
+                    if (!game.world.isConnected(connectionPosition, sf::Vector2i(x, y)))
+                        game.world.connect(connectionPosition, sf::Vector2i(x, y));
+                    else
+                        game.world.disconnect(connectionPosition, sf::Vector2i(x, y));
                 }
             } else if (game.player.getState() == WireDrawFromInput)
             {
                 if (inputRect.contains((sf::Vector2i) mouseCellPosition) && basicComponent != connectionComponent)
                 {
-                    game.world.connect(connectionPosition, sf::Vector2i(x, y), true);
-                    reset = true;
+                    if (!game.world.isConnected(connectionPosition, sf::Vector2i(x, y), true))
+                        game.world.connect(connectionPosition, sf::Vector2i(x, y), true);
+                    else
+                        game.world.disconnect(connectionPosition, sf::Vector2i(x, y), true);
                 } else if (outputRect.contains((sf::Vector2i) mouseCellPosition) && basicComponent != connectionComponent)
                 {
-                    game.world.connect(sf::Vector2i(x, y), connectionPosition);
-                    reset = true;
+                    if (!game.world.isConnected(sf::Vector2i(x, y), connectionPosition))
+                        game.world.connect(sf::Vector2i(x, y), connectionPosition);
+                    else
+                        game.world.disconnect(sf::Vector2i(x, y), connectionPosition);
                 }
             }
         }
     }
-    if (reset)
+    if (game.player.getState() == WireDrawFromInput || game.player.getState() == WireDrawFromOutput)
     {
         game.player.setState(Normal);
         connectionComponent = nullptr;

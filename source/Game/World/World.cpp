@@ -40,14 +40,14 @@ sf::Vector2u World::handlePosition(sf::Vector2i position)
 void World::addComponent(Component component, sf::Vector2i position, Rotation rotation)
 {
     sf::Vector2i chunk = getChunk(position);
-
+    
     uint32_t absolute = getAbsolute(chunk);
-
+    
     if (chunks[absolute] == nullptr)
     {
         chunks[absolute] = new Chunk((sf::Vector2<int8_t>) chunk);
     }
-
+    
     chunks[absolute]->addComponent(component, handlePosition(position), rotation);
 }
 
@@ -56,7 +56,7 @@ Fragment* World::getFragmentFromPoint(sf::Vector2i point)
     uint32_t absolute = getAbsolute(getChunk(point));
     if (chunks[absolute] == nullptr)
         return nullptr;
-    chunks[getAbsolute(getChunk(point))]->getFragment(handlePosition(point));
+    return chunks[getAbsolute(getChunk(point))]->getFragment(handlePosition(point));
 }
 
 BasicComponent* World::getComponent(sf::Vector2i componentPosition)
@@ -73,8 +73,24 @@ void World::connect(sf::Vector2i from, sf::Vector2i to, bool in)
 {
     BasicComponent* first = getComponent(from);
     BasicComponent* second = getComponent(to);
-
+    
     first->connect(second, in);
+}
+
+void World::disconnect(sf::Vector2i from, sf::Vector2i to, bool in)
+{
+    BasicComponent* first = getComponent(from);
+    BasicComponent* second = getComponent(to);
+    
+    first->disconnect(second, in);
+}
+
+bool World::isConnected(sf::Vector2i from, sf::Vector2i to, bool in)
+{
+    BasicComponent* first = getComponent(from);
+    BasicComponent* second = getComponent(to);
+    
+    return first->isConnected(second, in);
 }
 
 void World::doTick()
@@ -89,7 +105,7 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
     sf::Vector2f bottomright = playerPosition + resolution / (float) scale;
     sf::Vector2i fromChunk = getChunk(sf::Vector2i(floor(topleft.x / 11), floor(topleft.y / 11)));
     sf::Vector2i toChunk = getChunk(sf::Vector2i(floor(bottomright.x / 11), floor(bottomright.y / 11)));
-
+    
     for (int y = fromChunk.y; y <= toChunk.y; y++)
     {
         for (int x = fromChunk.x; x <= toChunk.x; x++)
@@ -114,7 +130,7 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
                                                                std::min(screenSecond.y, chunkSecond.y));
                 intersactionFirst -= chunkFirst;
                 intersactionSecond -= chunkFirst;
-
+                
                 sf::Vector2i firstFragment = Chunk::getFragment((sf::Vector2i) intersactionFirst / 11);
                 sf::Vector2i lastFragment = Chunk::getFragment((sf::Vector2i) intersactionSecond / 11);
                 chunks[absolute]->drawBody(window, playerPosition, scale, firstFragment, lastFragment);
@@ -140,7 +156,7 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
                                                                std::min(screenSecond.y, chunkSecond.y));
                 intersactionFirst -= chunkFirst;
                 intersactionSecond -= chunkFirst;
-
+                
                 sf::Vector2i firstFragment = Chunk::getFragment((sf::Vector2i) intersactionFirst / 11);
                 sf::Vector2i lastFragment = Chunk::getFragment((sf::Vector2i) intersactionSecond / 11);
                 chunks[absolute]->drawWires(window, playerPosition, scale, firstFragment, lastFragment);
@@ -166,7 +182,7 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
                                                                std::min(screenSecond.y, chunkSecond.y));
                 intersactionFirst -= chunkFirst;
                 intersactionSecond -= chunkFirst;
-
+                
                 sf::Vector2i firstFragment = Chunk::getFragment((sf::Vector2i) intersactionFirst / 11);
                 sf::Vector2i lastFragment = Chunk::getFragment((sf::Vector2i) intersactionSecond / 11);
                 chunks[absolute]->drawPegs(window, playerPosition, scale, firstFragment, lastFragment);

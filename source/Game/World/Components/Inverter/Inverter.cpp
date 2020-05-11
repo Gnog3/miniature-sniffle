@@ -88,23 +88,20 @@ sf::IntRect Inverter::getInputRectangle(sf::Vector2i componentPosition)
 
 sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
 {
-    Rotation rotation = Rotation (data & 0b11u);
+    Rotation rotation = Rotation(data & 0b11u);
     switch (rotation)
     {
         case Up:
             return sf::IntRect(componentPosition.x + 3, componentPosition.y - 3, 5, 3);
-            break;
         case Right:
             return sf::IntRect(componentPosition.x + 11, componentPosition.y + 3, 3, 5);
-            break;
         case Down:
             return sf::IntRect(componentPosition.x + 3, componentPosition.y + 11, 5, 3);
-            break;
         case Left:
             return sf::IntRect(componentPosition.x - 3, componentPosition.y + 3, 3, 5);
-            break;
     }
-    
+    std::cout << "error не знаю почему но компилятор ругается" << std::endl;
+    std::exit(-123);
 }
 
 void Inverter::update()

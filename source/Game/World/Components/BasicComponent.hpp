@@ -46,12 +46,18 @@ class BasicComponent
         sf::Vector2<uint8_t> fragmentPosition; // 2 bytes
         
         void insertPointer(BasicComponent* basicComponent, uint32_t offset);
+        void removePointer(uint32_t index);
         void addInputWire(BasicComponent* basicComponent);
         void addOutputWire(BasicComponent* basicComponent);
         void addInputActual(BasicComponent* basicComponent);
         void addOutputActual(BasicComponent* basicComponent);
+        void removeInputWire(BasicComponent* basicComponent);
+        void removeOutputWire(BasicComponent* basicComponent);
+        void removeInputActual(BasicComponent* basicComponent);
+        void removeOutputActual(BasicComponent* basicComponent);
         static bool insertIfNotIn(std::vector<Connection>& connections, Connection connection);
-    
+        void clearActualIn();
+        void clearActualOut();
     public:
         bool isWiredOutput(BasicComponent* basicComponent);
         BasicComponent() = default;
@@ -62,9 +68,12 @@ class BasicComponent
         void replacePointer(BasicComponent* from, BasicComponent* to);
         void fixMove(BasicComponent& old);
         ~BasicComponent();
+        void recalculateActuals();
         void connect(BasicComponent* basicComponent, bool in);
+        void disconnect(BasicComponent* bc, bool in);
         sf::Vector2<uint8_t> getPosition() const;
         bool getOutputState();
+        bool isConnected(BasicComponent* bc, bool in);
         BasicComponent* getWiredIn(uint8_t index);
         BasicComponent* getWiredOut(uint8_t index);
         BasicComponent* getActualIn(uint16_t index);

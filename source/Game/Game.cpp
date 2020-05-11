@@ -121,14 +121,10 @@ void Game::update()
     {
         if (isMouseInsideWindow(mousePosition))
         {
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && player.getActiveComponent() == Component::Nothing)
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
             {
-                if (player.getActiveComponent() == Component::Nothing)
-                {
-                    backgroundBoard.handlePlayerPosition(player.handleMousePosition(mousePosition));
-                    player.startDragging();
-                } else
-                    player.stopDragging();
+                backgroundBoard.handlePlayerPosition(player.handleMousePosition(mousePosition));
+                player.startDragging();
             } else
                 player.stopDragging();
         } else
