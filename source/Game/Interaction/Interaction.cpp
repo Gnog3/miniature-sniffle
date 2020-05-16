@@ -43,24 +43,45 @@ bool Interaction::handleConnectionTry(Game& game)
                 if (inputRect.contains((sf::Vector2i) mouseCellPosition) && basicComponent != connectionComponent)
                 {
                     if (!game.world.isConnected(connectionPosition, sf::Vector2i(x, y)))
-                        game.world.connect(connectionPosition, sf::Vector2i(x, y));
-                    else
-                        game.world.disconnect(connectionPosition, sf::Vector2i(x, y));
+                    {
+                        game.world.logicPause();
+                        game.world.connect(connectionPosition, sf::Vector2i(x, y), false, false);
+                        game.world.logicResume();
+                    } else
+                    {
+                        game.world.logicPause();
+                        game.world.disconnect(connectionPosition, sf::Vector2i(x, y), false, false);
+                        game.world.logicResume();
+                    }
                 }
             } else if (game.player.getState() == WireDrawFromInput)
             {
                 if (inputRect.contains((sf::Vector2i) mouseCellPosition) && basicComponent != connectionComponent)
                 {
                     if (!game.world.isConnected(connectionPosition, sf::Vector2i(x, y), true))
-                        game.world.connect(connectionPosition, sf::Vector2i(x, y), true);
-                    else
-                        game.world.disconnect(connectionPosition, sf::Vector2i(x, y), true);
+                    {
+                        game.world.logicPause();
+                        game.world.connect(connectionPosition, sf::Vector2i(x, y), true, false);
+                        game.world.logicResume();
+                    } else
+                    {
+                        game.world.logicPause();
+                        game.world.disconnect(connectionPosition, sf::Vector2i(x, y), true, false);
+                        game.world.logicResume();
+                    }
                 } else if (outputRect.contains((sf::Vector2i) mouseCellPosition) && basicComponent != connectionComponent)
                 {
                     if (!game.world.isConnected(sf::Vector2i(x, y), connectionPosition))
-                        game.world.connect(sf::Vector2i(x, y), connectionPosition);
-                    else
-                        game.world.disconnect(sf::Vector2i(x, y), connectionPosition);
+                    {
+                        game.world.logicPause();
+                        game.world.connect(sf::Vector2i(x, y), connectionPosition, false, false);
+                        game.world.logicResume();
+                    } else
+                    {
+                        game.world.logicPause();
+                        game.world.disconnect(sf::Vector2i(x, y), connectionPosition, false, false);
+                        game.world.logicResume();
+                    }
                 }
             }
         }
@@ -86,7 +107,7 @@ bool Interaction::handleNewComponentTry(Game& game)
     BasicComponent* component = game.world.getComponent(cell);
     if (component != nullptr)
         return false;
-    bool intersects;
+    bool intersects = false;
     {
         game.shadowComponent[game.player.getActiveComponent()].setRotation(game.player.getRotation());
         std::vector<sf::IntRect> newCompRects{
@@ -109,12 +130,18 @@ bool Interaction::handleNewComponentTry(Game& game)
                 for (auto& newCompRect : newCompRects)
                     for (auto& compRect : compRects)
                         if (newCompRect.intersects(compRect))
+                        {
                             intersects = true;
+                        }
             }
         }
     }
     if (!intersects)
-        game.world.addComponent(game.player.getActiveComponent(), cell, game.player.getRotation());
+    {
+        game.world.logicPause();
+        game.world.addComponent(game.player.getActiveComponent(), cell, game.player.getRotation(), false);
+        game.world.logicResume();
+    }
     return true;
 }
 
@@ -126,7 +153,10 @@ bool Interaction::handleRemoveComponentTry(Game& game)
     BasicComponent* component = game.world.getComponent(cell);
     if (component == nullptr)
         return false;
+    game.world.logicPause();
+    game.world.updateThread.array->deleteComponent(component);
     game.world.removeComponent(cell);
+    game.world.logicResume();
     return true;
 }
 

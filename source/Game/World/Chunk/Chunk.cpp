@@ -1,4 +1,5 @@
 #include "Chunk.hpp"
+#include "../UpdateThread/Array/Array.hpp"
 
 uint32_t Chunk::getAbsolute(sf::Vector2u fragment)
 {
@@ -26,7 +27,7 @@ Chunk::Chunk(sf::Vector2<int8_t> position)
     }
 }
 
-void Chunk::addComponent(Component component, sf::Vector2u position, Rotation rotation)
+void Chunk::addComponent(Component component, sf::Vector2u position, Rotation rotation, Array& array, bool setup)
 {
     sf::Vector2u fragment = position / 16u;
     uint32_t absolute = getAbsolute(fragment);
@@ -38,17 +39,17 @@ void Chunk::addComponent(Component component, sf::Vector2u position, Rotation ro
     
     position.x %= 16;
     position.y %= 16;
-    fragments[absolute]->addComponent(component, position, rotation);
+    fragments[absolute]->addComponent(component, position, rotation, array, setup);
     
 }
 
-bool Chunk::removeComponent(sf::Vector2u position)
+bool Chunk::removeComponent(sf::Vector2u position, Array& array)
 {
     sf::Vector2u fragment = position / 16u;
     uint32_t absolute = getAbsolute(fragment);
     position.x %= 16;
     position.y %= 16;
-    bool isEmpty = fragments[absolute]->removeComponent(position);
+    bool isEmpty = fragments[absolute]->removeComponent(position, array);
     if (isEmpty)
     {
         active--;
@@ -93,16 +94,14 @@ void Chunk::fullTick()
             fragment->fullTick();
     }
 }
-
-void Chunk::shiftState()
+void Chunk::shiftState(Array& array)
 {
     for (auto& fragment : fragments)
     {
         if (fragment != nullptr)
-            fragment->shiftState();
+            fragment->shiftState(array);
     }
 }
-
 void Chunk::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment)
 {
     for (int y = firstFragment.y; y <= lastFragment.y; ++y)

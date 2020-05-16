@@ -23,19 +23,56 @@ std::string Game::getDrawText()
     sf::Vector2u windowResolution = window.getSize();
     sf::Vector2f pos = player.getPosition();
     sf::Vector2f posMouse = mouseToCellPosition(sf::Mouse::getPosition(window));
-    string positionString = "X:" + to_string(pos.x) + " Y:" + to_string(pos.y) + "\nX:" +
-                            to_string(posMouse.x) + " Y:" + to_string(posMouse.y) + "\nX:" +
-                            to_string((float) player.getPosition().x + windowResolution.x / player.getScale()) + " Y:" +
-                            to_string((float) player.getPosition().y + windowResolution.y / player.getScale()) + "\nFPS:" +
-                            to_string(fps);
+//    string positionString = "X:" + to_string(pos.x) + " Y:" + to_string(pos.y) + "\nX:" +
+//                            to_string(posMouse.x) + " Y:" + to_string(posMouse.y) + "\nX:" +
+//                            to_string((float) player.getPosition().x + windowResolution.x / player.getScale()) + " Y:" +
+//                            to_string((float) player.getPosition().y + windowResolution.y / player.getScale()) + "\nFPS:" +
+//                            to_string(fps) + "\n\nTicks per second: " + to_string(world.updateThread.ups);
+    string positionString = "Ticks per second: " + to_string(world.updateThread.ups);
     return positionString;
 }
 
+//void Game::jk(sf::Vector2i pos)
+//{
+//
+//    sf::Vector2i last;
+//    bool first = true;
+//    for (int y = 0; y < 100; y++)
+//    {
+//        for (int x = 0; x < 100; x++)
+//        {
+//            world.addComponent(Component::Inverter, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), Up, true);
+//            if (!first)
+//            {
+//                world.connect(last, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), false, true);
+//            }
+//            first = false;
+//            last = sf::Vector2i(pos.x + x * 2, pos.y + y * 2);
+//        }
+//    }
+//    world.removeComponent(sf::Vector2i(pos.x + 198, pos.y + 198));
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 197), Up);
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 199), Up);
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y + 199), Up);
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y), Up);
+//
+//    world.connect(sf::Vector2i(pos.x + 200, pos.y + 197), sf::Vector2i(pos.x + 200, pos.y + 199), true);
+//    world.connect(sf::Vector2i(pos.x + 196, pos.y + 198), sf::Vector2i(pos.x + 200, pos.y + 197), false);
+//    world.connect(sf::Vector2i(pos.x + 200, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y + 199), true);
+//    world.connect(sf::Vector2i(pos.x - 1, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y), true);
+//    world.connect(sf::Vector2i(pos.x - 1, pos.y), sf::Vector2i(pos.x, pos.y), true);
+//}
+
 Game::Game()
 {
-    //window.setVerticalSyncEnabled(true);
-    interaction = new Interaction;
-    //window.setFramerateLimit(120);
+//    window.setVerticalSyncEnabled(true);
+//    window.setFramerateLimit(120);
+    sf::Clock c;
+//    jk(sf::Vector2i(0, 0));
+//    jk(sf::Vector2i(205, 0));
+//    jk(sf::Vector2i(410, 0));
+//    jk(sf::Vector2i(615, 0));
+    std::cout << c.getElapsedTime().asSeconds() << " seconds" << std::endl;
     
     deltaTimeClock.restart();
     font.loadFromFile("font.ttf");
@@ -43,7 +80,7 @@ Game::Game()
     new(&shadowComponent[Component::Inverter]) class Inverter;
     new(&shadowComponent[Component::Blotter]) class Blotter;
     new(&shadowComponent[Component::Peg]) class Peg;
-    
+    world.logicStart();
 }
 
 bool Game::isOpen()
@@ -58,7 +95,7 @@ bool Game::pollEvent(sf::Event& event)
 
 void Game::handleEvent(sf::Event& event)
 {
-    if (interaction->handleEvent(*this, event))
+    if (interaction.handleEvent(*this, event))
         return;
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     if (event.type == sf::Event::Closed ||
@@ -106,11 +143,11 @@ void Game::handleEvent(sf::Event& event)
                 else if (event.key.code == sf::Keyboard::Num1)
                     player.setComponent(Component::Nothing);
                 else if (event.key.code == sf::Keyboard::Num2)
-                    player.setComponent(Component::Inverter);
-                else if (event.key.code == sf::Keyboard::Num3)
                     player.setComponent(Component::Peg);
-//                else if (event.key.code == sf::Keyboard::U)
-//                    world.fullTick();
+                else if (event.key.code == sf::Keyboard::Num3)
+                    player.setComponent(Component::Inverter);
+                else if (event.key.code == sf::Keyboard::Num4)
+                    player.setComponent(Component::Blotter);
                 else
                     ret = false;
                 if (ret)
@@ -122,7 +159,7 @@ void Game::handleEvent(sf::Event& event)
 
 void Game::update()
 {
-    if (interaction->update(*this))
+    if (interaction.update(*this))
         return;
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     if (window.hasFocus())
@@ -139,18 +176,22 @@ void Game::update()
             player.stopDragging();
     } else
         player.stopDragging();
-    world.fullTick();
-    float deltaTime = deltaTimeClock.restart().asSeconds();
-    fps = 1 / deltaTime;
+    //float deltaTime = deltaTimeClock.restart().asSeconds();
 }
 
 void Game::draw()
 {
+    if (fpsClock.getElapsedTime().asMilliseconds() >= 1000)
+    {
+        fpsClock.restart();
+        fps = fpsCount;
+        fpsCount = 0;
+    }
     window.clear();
     sf::Clock drawClock;
     backgroundBoard.draw(&window);
     world.draw(&window, player.getPosition(), player.getScale());
-    interaction->drawShadow(*this);
+    interaction.drawShadow(*this);
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     
     stringstream str;
@@ -197,15 +238,15 @@ void Game::draw()
         //str << "\nBasicComponent:" << basicComponent1 << "\nX:" << worldPosition.x << " Y:" << worldPosition.y << "\nX:" << (int) basicComponent1->getFragmentPosition().x << " Y:" << (int) basicComponent1->getFragmentPosition().y;
     }
     
-    if (interaction->isConnecting(*this))
+    if (interaction.isConnecting(*this))
     {
-        sf::Vector2f firstPoint = (interaction->getStartConnectionPoint() - player.getPosition()) * (float) player.getScale();
+        sf::Vector2f firstPoint = (interaction.getStartConnectionPoint() - player.getPosition()) * (float) player.getScale();
         sf::Vector2f secondPoint = (sf::Vector2f) sf::Mouse::getPosition(window);
         sfLine sfline(firstPoint, secondPoint, sf::Color::Black, player.getScale());
         sfline.draw(window);
     }
     
-    str << "\nDraw time: " << std::setw(6) << std::setfill('0') << drawClock.getElapsedTime().asMicroseconds();
+    //str << "\nDraw time: " << std::setw(6) << std::setfill('0') << drawClock.getElapsedTime().asMicroseconds();
 
 //    sf::Texture shadow = shadowComponent[Component::Inverter].getPreviewTexture();
 //    sf::Sprite sprite(shadow);
@@ -221,6 +262,7 @@ void Game::draw()
     text.setOutlineThickness(3); // Position's text thingy
     window.draw(text);
     window.display();
+    fpsCount++;
 }
 
 #pragma clang diagnostic pop

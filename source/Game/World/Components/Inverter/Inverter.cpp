@@ -108,7 +108,7 @@ sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
 
 void Inverter::update()
 {
-    setNextState(!getInput());
+    setState(!getInput());
 }
 
 void Inverter::drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)

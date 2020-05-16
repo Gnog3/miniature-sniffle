@@ -22,7 +22,7 @@ uint16_t Fragment::getComponentAmount()
     return componentAmount;
 }
 
-void Fragment::addComponent(Component component, sf::Vector2u position, Rotation rotation)
+void Fragment::addComponent(Component component, sf::Vector2u position, Rotation rotation, Array& array, bool setup)
 {
     componentAmount++;
     BasicComponent* newComponentList = new BasicComponent[componentAmount];
@@ -32,7 +32,7 @@ void Fragment::addComponent(Component component, sf::Vector2u position, Rotation
         for (uint16_t i = 0; i < componentAmount - 1; i++)
         {
             std::memcpy(newComponentList + i, componentList + i, sizeof(BasicComponent));
-            newComponentList[i].fixMove(componentList[i]);
+            newComponentList[i].fixMove(componentList[i], array, setup);
         }
         delete[] componentList;
     }
@@ -53,7 +53,7 @@ void Fragment::addComponent(Component component, sf::Vector2u position, Rotation
     }
 }
 
-bool Fragment::removeComponent(sf::Vector2u position)
+bool Fragment::removeComponent(sf::Vector2u position, Array& array)
 {
     componentAmount--;
     if (componentAmount > 0)
@@ -66,18 +66,18 @@ bool Fragment::removeComponent(sf::Vector2u position)
             if (!found && (sf::Vector2<uint8_t>) position == componentList[i].getPosition())
             {
                 found = true;
-                componentList[i].disconnectAll();
+                componentList[i].disconnectAll(array);
                 continue;
             }
             std::memcpy(newComponentList + i - (found ? 1 : 0), componentList + i, sizeof(BasicComponent));
-            newComponentList[i - (found ? 1 : 0)].fixMove(componentList[i]);
+            newComponentList[i - (found ? 1 : 0)].fixMove(componentList[i], array, false);
         }
         delete[] componentList;
         componentList = newComponentList;
         return false;
     } else
     {
-        componentList[0].disconnectAll();
+        componentList[0].disconnectAll(array);
         delete[] componentList;
         componentList = nullptr;
         return true;
@@ -115,24 +115,22 @@ void Fragment::fullTick()
         componentList[i].update();
     }
 }
-
-void Fragment::shiftState()
+void Fragment::shiftState(Array& array)
 {
     for (uint16_t i = 0; i < componentAmount; i++)
     {
-        componentList[i].shiftState();
+        componentList[i].shiftState(array);
     }
 }
-
 void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)
 {
-    sf::RectangleShape rectangleShape(sf::Vector2f((16 * 11) * scale - 2, (16 * 11) * scale - 2));
-    rectangleShape.setOutlineColor(sf::Color::Blue);
-    rectangleShape.setFillColor(sf::Color::Transparent);
-    rectangleShape.setOutlineThickness(-3);
-    rectangleShape.setPosition(
-            ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
-            chunkPosition);
+//    sf::RectangleShape rectangleShape(sf::Vector2f((16 * 11) * scale - 2, (16 * 11) * scale - 2));
+//    rectangleShape.setOutlineColor(sf::Color::Blue);
+//    rectangleShape.setFillColor(sf::Color::Transparent);
+//    rectangleShape.setOutlineThickness(-3);
+//    rectangleShape.setPosition(
+//            ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
+//            chunkPosition);
     
     sf::Vector2f fragmentPosition = ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + chunkPosition;
     
@@ -141,7 +139,7 @@ void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, s
         componentList[i].drawBody(window, fragmentPosition, scale);
     }
     
-    window->draw(rectangleShape);
+//    window->draw(rectangleShape);
 }
 
 void Fragment::drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)

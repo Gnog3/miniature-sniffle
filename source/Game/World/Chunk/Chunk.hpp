@@ -7,6 +7,7 @@
 #include "../../Rotation.hpp"
 #include "../Fragment/Fragment.hpp"
 #include "../Components/Component.hpp"
+#include "../UpdateThread/Array/Array.hpp"
 #include <iostream>
 
 
@@ -21,13 +22,13 @@ class Chunk
         static sf::Vector2i getRelative(uint32_t absolute);
         static sf::Vector2i getFragment(sf::Vector2i position);
         Chunk(sf::Vector2<int8_t> position);
-        void addComponent(Component component, sf::Vector2u position, Rotation rotation);
-        bool removeComponent(sf::Vector2u position);
+        void addComponent(Component component, sf::Vector2u position, Rotation rotation, Array& array, bool setup);
+        bool removeComponent(sf::Vector2u position, Array& array);
         Fragment* getFragment(sf::Vector2u fragment);
         BasicComponent* getComponent(sf::Vector2u componentPosition);
         void calculateInputs();
         void fullTick();
-        void shiftState();
+        void shiftState(Array& array);
         void drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment);
         void drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment);
         void drawPegs(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t scale, sf::Vector2i firstFragment, sf::Vector2i lastFragment);

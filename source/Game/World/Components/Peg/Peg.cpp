@@ -99,6 +99,7 @@ void Peg::drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint
 
 void Peg::drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)
 {
+    calculateInput();
     for (uint8_t i = 0; i < wiredInAmount; i++)
     {
         sf::Vector2i fragmentDifference = (sf::Vector2i) (getWiredIn(i)->getFragmentPosition() - this->fragmentPosition);
@@ -109,6 +110,7 @@ void Peg::drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uin
         sf::Vector2f first = (getWiredIn(i)->isWiredOutput(this) ? getWiredIn(i)->getOutputPoint() : getWiredIn(i)->getInputPoint()) * (float) scale + fragmentPosition;
         first += (sf::Vector2f) (fragmentDifference * 16 * 11 * (int) scale);
         sf::Vector2f second = getInputPoint() * (float) scale + fragmentPosition;
+        
         sfLine sfline(first, second, getInput() ? sf::Color::Red : sf::Color::Black, scale);
         sfline.draw(*window);
     }
@@ -125,7 +127,6 @@ void Peg::drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint
     };
     uint16_t rotation = (0b11u & data) * 90;
     uint8_t state = (0b11000u & data) >> 3u;
-    state += 0;
     sf::Vector2f position = sf::Vector2f(0b1111u & this->position, (0b11110000u & this->position) >> 4u) * 11.0f;
     sprite[state].setRotation(rotation);
     sprite[state].setScale(sf::Vector2f(scale, scale));

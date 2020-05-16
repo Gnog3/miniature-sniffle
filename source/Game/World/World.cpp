@@ -2,6 +2,7 @@
 
 #include "World.hpp"
 
+
 sf::Vector2i World::getChunk(sf::Vector2i position)
 {
     position.x = position.x < 0 ? (position.x - 4095) / 4096 : position.x / 4096;
@@ -30,6 +31,11 @@ World::World()
     }
 }
 
+World::~World()
+{
+    updateThread.logicStop();
+}
+
 sf::Vector2u World::handlePosition(sf::Vector2i position)
 {
     position.x = position.x < 0 ? (4096 + (position.x % 4096)) % 4096 : position.x % 4096;
@@ -37,7 +43,7 @@ sf::Vector2u World::handlePosition(sf::Vector2i position)
     return (sf::Vector2u) position;
 }
 
-void World::addComponent(Component component, sf::Vector2i position, Rotation rotation)
+void World::addComponent(Component component, sf::Vector2i position, Rotation rotation, bool setup)
 {
     sf::Vector2i chunk = getChunk(position);
     uint32_t absolute = getAbsolute(chunk);
@@ -46,7 +52,7 @@ void World::addComponent(Component component, sf::Vector2i position, Rotation ro
         chunks[absolute] = new Chunk((sf::Vector2<int8_t>) chunk);
     }
     
-    chunks[absolute]->addComponent(component, handlePosition(position), rotation);
+    chunks[absolute]->addComponent(component, handlePosition(position), rotation, *updateThread.array, setup);
 }
 
 void World::removeComponent(sf::Vector2i position)
@@ -55,13 +61,34 @@ void World::removeComponent(sf::Vector2i position)
     
     uint32_t absolute = getAbsolute(chunk);
     
-    bool isEmpty = chunks[absolute]->removeComponent(handlePosition(position));
+    bool isEmpty = chunks[absolute]->removeComponent(handlePosition(position), *updateThread.array);
     
     if (isEmpty)
     {
         delete chunks[absolute];
         chunks[absolute] = nullptr;
     }
+}
+
+void World::logicStart()
+{
+    updateThread.logicLaunch(*this);
+}
+
+void World::logicResume()
+{
+    worldChangeMutex.unlock();
+    
+}
+
+void World::logicPause()
+{
+    while (!worldChangeMutex.try_lock());
+}
+
+void World::logicStop()
+{
+    updateThread.logicStop();
 }
 
 Fragment* World::getFragmentFromPoint(sf::Vector2i point)
@@ -82,20 +109,20 @@ BasicComponent* World::getComponent(sf::Vector2i componentPosition)
     return chunks[absolute]->getComponent(handlePosition(componentPosition));
 }
 
-void World::connect(sf::Vector2i from, sf::Vector2i to, bool in)
+void World::connect(sf::Vector2i from, sf::Vector2i to, bool in, bool setup)
 {
     BasicComponent* first = getComponent(from);
     BasicComponent* second = getComponent(to);
     
-    first->connect(second, in);
+    first->connect(second, in, *updateThread.array, setup);
 }
 
-void World::disconnect(sf::Vector2i from, sf::Vector2i to, bool in)
+void World::disconnect(sf::Vector2i from, sf::Vector2i to, bool in, bool setup)
 {
     BasicComponent* first = getComponent(from);
     BasicComponent* second = getComponent(to);
     
-    first->disconnect(second, in);
+    first->disconnect(second, in, *updateThread.array, setup);
 }
 
 bool World::isConnected(sf::Vector2i from, sf::Vector2i to, bool in)
@@ -106,22 +133,22 @@ bool World::isConnected(sf::Vector2i from, sf::Vector2i to, bool in)
     return first->isConnected(second, in);
 }
 
-void World::fullTick()
+void World::fullTick(Array& array)
 {
-    for (auto & chunk : chunks)
+    for (auto& chunk : chunks)
     {
         if (chunk != nullptr)
             chunk->calculateInputs();
     }
-    for (auto & chunk : chunks)
+    for (auto& chunk : chunks)
     {
         if (chunk != nullptr)
             chunk->fullTick();
     }
-    for (auto & chunk : chunks)
+    for (auto& chunk : chunks)
     {
         if (chunk != nullptr)
-            chunk->shiftState();
+            chunk->shiftState(array);
     }
 }
 
@@ -141,12 +168,12 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
             if (chunks[absolute] != nullptr)
             {
                 sf::Vector2i position(x, y);
-                sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
-                rectangleShape.setOutlineColor(sf::Color::Red);
-                rectangleShape.setFillColor(sf::Color::Transparent);
-                rectangleShape.setOutlineThickness(-3);
-                rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
-                window->draw(rectangleShape);
+//                sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
+//                rectangleShape.setOutlineColor(sf::Color::Red);
+//                rectangleShape.setFillColor(sf::Color::Transparent);
+//                rectangleShape.setOutlineThickness(-3);
+//                rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
+//                window->draw(rectangleShape);
                 sf::Vector2f screenFirst = playerPosition;
                 sf::Vector2f screenSecond = screenFirst + resolution / (float) scale;
                 sf::Vector2f chunkFirst = (sf::Vector2f) position * (float) (11 * 4096);

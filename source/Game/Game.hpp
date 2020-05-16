@@ -19,20 +19,21 @@
 using namespace std;
 
 class Interaction;
-
+#include "Interaction/Interaction.hpp"
 class Game
 {
         friend Interaction;
     private:
-        sf::String windowLabel = "The Window";
-        sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(800, 600), windowLabel, sf::Style::Default, sf::ContextSettings(0, 0, 4));
+        sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(1280, 720), "sim++", sf::Style::Default, sf::ContextSettings(0, 0, 4));
         sf::Clock deltaTimeClock;
+        sf::Clock fpsClock;
+        uint32_t fpsCount = 0;
         sf::Font font;
         BasicComponent shadowComponent[Component::AMOUNT];
         Player player;
         BackgroundBoard backgroundBoard = BackgroundBoard(window.getSize(), player.getScale());
         World world;
-        Interaction* interaction; // initialization is in constructor
+        Interaction interaction; // initialization is in constructor
         float fps = 0;
         
         bool isMouseInsideWindow(sf::Vector2i mousePosition);
@@ -40,6 +41,7 @@ class Game
         std::string getDrawText();
         void handleMousePress();
     public:
+        //void jk(sf::Vector2i pos);
         Game();
         bool isOpen();
         bool pollEvent(sf::Event& event);
@@ -48,6 +50,6 @@ class Game
         void draw();
 };
 
-#include "Interaction/Interaction.hpp"
+
 
 #endif //GAME_GAME_HPP
