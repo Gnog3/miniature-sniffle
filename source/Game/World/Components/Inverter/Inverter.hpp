@@ -11,12 +11,11 @@ class Inverter : public BasicComponent
 {
     private:
         sf::Sprite getBodySprite(sf::Texture* texture) override;
-        
         sf::Sprite getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out) override;
     
     public:
         Inverter();
-        Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation);
+        Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData);
         Component getComponent() override;
         sf::Vector2f getInputPoint() override;
         sf::Vector2f getOutputPoint() override;

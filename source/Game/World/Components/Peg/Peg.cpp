@@ -51,7 +51,7 @@ sf::Sprite Peg::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out)
 Peg::Peg() : BasicComponent()
 {}
 
-Peg::Peg(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition) : BasicComponent(Component::Inverter, position, fragmentPosition, 0)
+Peg::Peg(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition) : BasicComponent(position, fragmentPosition, 0)
 {}
 
 Component Peg::getComponent()

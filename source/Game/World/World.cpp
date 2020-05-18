@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "World.hpp"
+#include "Components/ComponentData.hpp"
 
 
 sf::Vector2i World::getChunk(sf::Vector2i position)
@@ -43,7 +44,7 @@ sf::Vector2u World::handlePosition(sf::Vector2i position)
     return (sf::Vector2u) position;
 }
 
-void World::addComponent(Component component, sf::Vector2i position, Rotation rotation, bool setup)
+void World::addComponent(Component component, sf::Vector2i position, ComponentData componentData, bool setup)
 {
     sf::Vector2i chunk = getChunk(position);
     uint32_t absolute = getAbsolute(chunk);
@@ -52,7 +53,7 @@ void World::addComponent(Component component, sf::Vector2i position, Rotation ro
         chunks[absolute] = new Chunk((sf::Vector2<int8_t>) chunk);
     }
     
-    chunks[absolute]->addComponent(component, handlePosition(position), rotation, *updateThread.array, setup);
+    chunks[absolute]->addComponent(component, handlePosition(position), componentData, *updateThread.array, setup);
 }
 
 void World::removeComponent(sf::Vector2i position)

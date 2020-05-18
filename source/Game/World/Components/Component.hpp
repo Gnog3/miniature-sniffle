@@ -8,6 +8,7 @@ enum Component : uint8_t
     Inverter,
     Blotter,
     Peg,
+    Switch,
     AMOUNT
 };
 

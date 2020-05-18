@@ -81,16 +81,16 @@ Rotation Player::rotate(Rotation rotation)
 {
     switch (rotation)
     {
-        case Up:
-            return Right;
-        case Right:
-            return Down;
-        case Down:
-            return Left;
-        case Left:
-            return Up;
+        case Rotation::Up:
+            return Rotation::Right;
+        case Rotation::Right:
+            return Rotation::Down;
+        case Rotation::Down:
+            return Rotation::Left;
+        case Rotation::Left:
+            return Rotation::Up;
     }
-    return Up; // Компилятор говорит, что функция может дойти до когца и ничего не вернуть,
+    return Rotation::Up; // Компилятор говорит, что функция может дойти до когца и ничего не вернуть,
     // так что оставлю это здесь. Видимо, баг.
 }
 
@@ -98,17 +98,17 @@ void Player::rotate()
 {
     switch (selectedRotation)
     {
-        case Up:
-            selectedRotation = Right;
+        case Rotation::Up:
+            selectedRotation = Rotation::Right;
             break;
-        case Right:
-            selectedRotation = Down;
+        case Rotation::Right:
+            selectedRotation = Rotation::Down;
             break;
-        case Down:
-            selectedRotation = Left;
+        case Rotation::Down:
+            selectedRotation = Rotation::Left;
             break;
-        case Left:
-            selectedRotation = Up;
+        case Rotation::Left:
+            selectedRotation = Rotation::Up;
             break;
     }
 }

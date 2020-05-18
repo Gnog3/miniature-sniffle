@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-enum Rotation : uint8_t
+enum class Rotation : uint8_t
 {
     Up = 0,
     Right = 1,

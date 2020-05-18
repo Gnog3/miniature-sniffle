@@ -17,7 +17,7 @@ class Player
         uint8_t scale = 8;
         bool dragging = false;
         Component selectedComponent = Nothing;
-        Rotation selectedRotation = Up;
+        Rotation selectedRotation = Rotation::Up;
         PlayerState state = Normal;
     public:
         void move(sf::Vector2f offset);

@@ -8,6 +8,7 @@
 #include "../Fragment/Fragment.hpp"
 #include "../Components/Component.hpp"
 #include "../UpdateThread/Array/Array.hpp"
+#include "../Components/ComponentData.hpp"
 #include <iostream>
 
 
@@ -22,7 +23,7 @@ class Chunk
         static sf::Vector2i getRelative(uint32_t absolute);
         static sf::Vector2i getFragment(sf::Vector2i position);
         Chunk(sf::Vector2<int8_t> position);
-        void addComponent(Component component, sf::Vector2u position, Rotation rotation, Array& array, bool setup);
+        void addComponent(Component component, sf::Vector2u position, ComponentData componentData, Array& array, bool setup);
         bool removeComponent(sf::Vector2u position, Array& array);
         Fragment* getFragment(sf::Vector2u fragment);
         BasicComponent* getComponent(sf::Vector2u componentPosition);

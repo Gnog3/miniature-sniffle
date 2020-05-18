@@ -60,10 +60,8 @@ sf::Sprite Inverter::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color
 Inverter::Inverter() : BasicComponent()
 {}
 
-Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation) : BasicComponent(Component::Inverter, position, fragmentPosition, rotation)
-{
-    data |= 0b1000u;
-}
+Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData) : BasicComponent(position, fragmentPosition, componentData)
+{}
 
 Component Inverter::getComponent()
 {
@@ -98,13 +96,13 @@ sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
     Rotation rotation = Rotation(data & 0b11u);
     switch (rotation)
     {
-        case Up:
+        case Rotation::Up:
             return sf::IntRect(componentPosition.x + 3, componentPosition.y - 3, 5, 3);
-        case Right:
+        case Rotation::Right:
             return sf::IntRect(componentPosition.x + 11, componentPosition.y + 3, 3, 5);
-        case Down:
+        case Rotation::Down:
             return sf::IntRect(componentPosition.x + 3, componentPosition.y + 11, 5, 3);
-        case Left:
+        case Rotation::Left:
             return sf::IntRect(componentPosition.x - 3, componentPosition.y + 3, 3, 5);
     }
     std::cout << "error не знаю почему но компилятор ругается" << std::endl;

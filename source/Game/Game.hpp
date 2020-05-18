@@ -14,6 +14,7 @@
 #include "World/Components/Inverter/Inverter.hpp"
 #include "World/Components/Blotter/Blotter.hpp"
 #include "World/Components/Peg/Peg.hpp"
+#include "World/Components/ComponentData.hpp"
 
 
 using namespace std;

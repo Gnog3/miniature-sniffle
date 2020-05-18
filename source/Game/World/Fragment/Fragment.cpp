@@ -1,6 +1,7 @@
 
 #include "Fragment.hpp"
 
+
 Fragment::Fragment(sf::Vector2<uint8_t> position)
 {
     componentList = nullptr;
@@ -22,7 +23,7 @@ uint16_t Fragment::getComponentAmount()
     return componentAmount;
 }
 
-void Fragment::addComponent(Component component, sf::Vector2u position, Rotation rotation, Array& array, bool setup)
+void Fragment::addComponent(Component component, sf::Vector2u position, ComponentData componentData, Array& array, bool setup)
 {
     componentAmount++;
     BasicComponent* newComponentList = new BasicComponent[componentAmount];
@@ -41,16 +42,21 @@ void Fragment::addComponent(Component component, sf::Vector2u position, Rotation
     
     switch (component)
     {
-        case Component::Inverter:
-            new(&componentList[componentAmount - 1]) class Inverter((sf::Vector2<uint8_t>) position, this->position, rotation);
-            break;
-        case Component::Blotter:
-            new(&componentList[componentAmount - 1]) class Blotter((sf::Vector2<uint8_t>) position, this->position, rotation);
-            break;
         case Component::Peg:
             new(&componentList[componentAmount - 1]) class Peg((sf::Vector2<uint8_t>) position, this->position);
             break;
+        case Component::Inverter:
+            new(&componentList[componentAmount - 1]) class Inverter((sf::Vector2<uint8_t>) position, this->position, (uint8_t) componentData);
+            break;
+        case Component::Blotter:
+            new(&componentList[componentAmount - 1]) class Blotter((sf::Vector2<uint8_t>) position, this->position, (uint8_t) componentData);
+            break;
+        case Component::Switch:
+            new(&componentList[componentAmount - 1]) class Switch((sf::Vector2<uint8_t>) position, this->position, (uint8_t) componentData);
+            break;
     }
+    if (!setup)
+        array.add(&componentList[componentAmount - 1]);
 }
 
 bool Fragment::removeComponent(sf::Vector2u position, Array& array)

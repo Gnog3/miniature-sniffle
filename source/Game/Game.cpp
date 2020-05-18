@@ -35,32 +35,39 @@ std::string Game::getDrawText()
 void Game::jk(sf::Vector2i pos)
 {
 
-    sf::Vector2i last;
-    bool first = true;
-    for (int y = 0; y < 100; y++)
-    {
-        for (int x = 0; x < 100; x++)
-        {
-            world.addComponent(Component::Inverter, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), Up, true);
-            if (!first)
-            {
-                world.connect(last, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), false, true);
-            }
-            first = false;
-            last = sf::Vector2i(pos.x + x * 2, pos.y + y * 2);
-        }
-    }
-    world.removeComponent(sf::Vector2i(pos.x + 198, pos.y + 198));
-    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 197), Rotation::Up, true);
-    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 199), Up, true);
-    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y + 199), Up, true);
-    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y), Up, true);
-
-    world.connect(sf::Vector2i(pos.x + 200, pos.y + 197), sf::Vector2i(pos.x + 200, pos.y + 199), true, true);
-    world.connect(sf::Vector2i(pos.x + 196, pos.y + 198), sf::Vector2i(pos.x + 200, pos.y + 197), false, true);
-    world.connect(sf::Vector2i(pos.x + 200, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y + 199), true, true);
-    world.connect(sf::Vector2i(pos.x - 1, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y), true, true);
-    world.connect(sf::Vector2i(pos.x - 1, pos.y), sf::Vector2i(pos.x, pos.y), true, true);
+//    sf::Vector2i last;
+//    bool first = true;
+//    for (int y = 0; y < 100; y++)
+//    {
+//        for (int x = 0; x < 200; x++)
+//        {
+//            world.addComponent(Component::Inverter, sf::Vector2i(pos.x + x, pos.y + y * 2), Up, true);
+//            if (!first)
+//            {
+//                world.connect(last, sf::Vector2i(pos.x + x, pos.y + y * 2), false, true);
+//            }
+//            first = false;
+//            last = sf::Vector2i(pos.x + x, pos.y + y * 2);
+//        }
+//    }
+//    world.removeComponent(sf::Vector2i(pos.x + 199, pos.y + 198));
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 197), Rotation::Up, true);
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 199), Up, true);
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y + 199), Up, true);
+//    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y), Up, true);
+//
+//    world.connect(sf::Vector2i(pos.x + 200, pos.y + 197), sf::Vector2i(pos.x + 200, pos.y + 199), true, true);
+//    world.connect(sf::Vector2i(pos.x + 196, pos.y + 198), sf::Vector2i(pos.x + 200, pos.y + 197), false, true);
+//    world.connect(sf::Vector2i(pos.x + 200, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y + 199), true, true);
+//    world.connect(sf::Vector2i(pos.x - 1, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y), true, true);
+//    world.connect(sf::Vector2i(pos.x - 1, pos.y), sf::Vector2i(pos.x, pos.y), true, true);
+//    `for (int y = 0; y < 200; y++)
+//    {
+//        for (int x = 0; x < 200; x++)
+//        {
+//            world.addComponent(Component::Peg, sf::Vector2i(x, y), Up, true);
+//        }
+//    }`
 }
 
 Game::Game()
@@ -72,6 +79,11 @@ Game::Game()
     //jk(sf::Vector2i(205, 0));
     //jk(sf::Vector2i(410, 0));
     //jk(sf::Vector2i(615, 0));
+    world.addComponent(Component::Blotter, sf::Vector2i(5, 5), ComponentData::Right, true);
+    world.addComponent(Component::Peg, sf::Vector2i(5, 8), ComponentData::Up, true);
+    world.addComponent(Component::Peg, sf::Vector2i(8, 8), ComponentData::Up, true);
+    world.connect(sf::Vector2i(5, 5), sf::Vector2i(5, 8), true, true);
+    world.connect(sf::Vector2i(5, 5), sf::Vector2i(8, 8), false, true);
     std::cout << c.getElapsedTime().asSeconds() << " seconds" << std::endl;
     
     deltaTimeClock.restart();
@@ -80,6 +92,7 @@ Game::Game()
     new(&shadowComponent[Component::Inverter]) class Inverter;
     new(&shadowComponent[Component::Blotter]) class Blotter;
     new(&shadowComponent[Component::Peg]) class Peg;
+    new(&shadowComponent[Component::Switch]) class Switch;
     world.logicStart();
 }
 
@@ -147,6 +160,8 @@ void Game::handleEvent(sf::Event& event)
                     player.setComponent(Component::Inverter);
                 else if (event.key.code == sf::Keyboard::Num4)
                     player.setComponent(Component::Blotter);
+                else if (event.key.code == sf::Keyboard::Num5)
+                    player.setComponent(Component::Switch);
                 else
                     ret = false;
                 if (ret)

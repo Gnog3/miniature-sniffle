@@ -5,7 +5,7 @@ void UpdateThread::main(World& world)
     world.fullTick(*array);
     while (!requireStop)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
         while (requirePause)
         {
             isPaused = true;

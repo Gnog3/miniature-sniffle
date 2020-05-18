@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "../World/Components/BasicComponent.hpp"
 #include "../PlayerState.hpp"
+#include "../World/Components/Switch/Switch.hpp"
 class Game;
 
 class Interaction
@@ -17,6 +18,7 @@ class Interaction
         bool handleConnectionTry(Game& game);
         static bool handleNewComponentTry(Game& game);
         static bool handleRemoveComponentTry(Game& game);
+        static bool handleInteractables(Game& game);
     public:
         static bool isConnecting(Game& game);
         sf::Vector2f getStartConnectionPoint();

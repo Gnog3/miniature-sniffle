@@ -190,12 +190,12 @@ bool BasicComponent::insertIfNotIn(std::vector<Connection>& connections, Connect
 //    actualOutAmount = 0;
 //}
 
-BasicComponent::BasicComponent(Component component, sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation)
+BasicComponent::BasicComponent(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData)
 {
     this->position += position.x;
     this->position += position.y << (uint8_t) 4;
     this->fragmentPosition = fragmentPosition;
-    data = rotation;
+    data = componentData;
 }
 
 void BasicComponent::clonePointersArray()
@@ -501,7 +501,7 @@ Rotation BasicComponent::getRotation() const
 
 void BasicComponent::setRotation(Rotation rotation)
 {
-    data = (data & 0b11111100u) | rotation;
+    data = (data & 0b11111100u) | (uint8_t) rotation;
 }
 
 void BasicComponent::drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f position, uint8_t scale, Rotation rotation)

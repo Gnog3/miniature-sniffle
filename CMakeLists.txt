@@ -40,7 +40,7 @@ add_executable(Game
         source/Game/Interaction/Interaction.cpp
         source/Game/Interaction/Interaction.hpp
         source/Game/World/UpdateThread/UpdateThread.cpp
-        source/Game/World/UpdateThread/UpdateThread.hpp source/Game/World/UpdateThread/Array/Array.cpp source/Game/World/UpdateThread/Array/Array.hpp)
+        source/Game/World/UpdateThread/UpdateThread.hpp source/Game/World/UpdateThread/Array/Array.cpp source/Game/World/UpdateThread/Array/Array.hpp source/Game/World/Components/Switch/Switch.cpp source/Game/World/Components/Switch/Switch.hpp source/Game/World/Components/ComponentData.hpp)
 
 target_link_libraries(Game sfml-graphics sfml-audio sfml-system sfml-window)
 target_link_libraries(Game ${PTHREAD_LIBRARY})

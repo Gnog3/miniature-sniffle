@@ -14,6 +14,8 @@
 #include "UpdateThread/Array/Array.hpp"
 class UpdateThread;
 #include "UpdateThread/UpdateThread.hpp"
+#include "Components/ComponentData.hpp"
+
 class World
 {
         friend UpdateThread;
@@ -30,7 +32,7 @@ class World
         World();
         ~World();
         static sf::Vector2u handlePosition(sf::Vector2i position);
-        void addComponent(Component component, sf::Vector2i position, Rotation rotation, bool setup);
+        void addComponent(Component component, sf::Vector2i position, ComponentData componentData, bool setup);
         void removeComponent(sf::Vector2i position);
         void logicStart();
         void logicResume();

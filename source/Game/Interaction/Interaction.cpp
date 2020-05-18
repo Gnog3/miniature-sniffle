@@ -139,7 +139,7 @@ bool Interaction::handleNewComponentTry(Game& game)
     if (!intersects)
     {
         game.world.logicPause();
-        game.world.addComponent(game.player.getActiveComponent(), cell, game.player.getRotation(), false);
+        game.world.addComponent(game.player.getActiveComponent(), cell, (ComponentData) game.player.getRotation(), false);
         game.world.logicResume();
     }
     return true;
@@ -157,6 +157,26 @@ bool Interaction::handleRemoveComponentTry(Game& game)
     game.world.removeComponent(cell);
     game.world.logicResume();
     return true;
+}
+
+bool Interaction::handleInteractables(Game& game)
+{
+    if (game.player.getActiveComponent() != Nothing)
+        return false;
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(game.window);
+    sf::Vector2f mouseCellPosition = game.mouseToCellPosition(mousePosition);
+    sf::Vector2i cell(std::floor(mouseCellPosition.x / 11), std::floor(mouseCellPosition.y / 11));
+    BasicComponent* component = game.world.getComponent(cell);
+    if (component == nullptr)
+        return false;
+    if (component->getComponent() == Component::Switch)
+    {
+        game.world.logicPause();
+        ((class Switch*) component)->press(*game.world.updateThread.array);
+        game.world.logicResume();
+        return true;
+    }
+    return false;
 }
 
 bool Interaction::isConnecting(Game& game)
@@ -199,6 +219,8 @@ bool Interaction::handleEvent(Game& game, sf::Event& event)
                 if (handleConnectionTry(game))
                     return true;
                 if (handleNewComponentTry(game))
+                    return true;
+                if (handleInteractables(game))
                     return true;
             }
         }

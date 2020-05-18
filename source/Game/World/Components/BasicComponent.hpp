@@ -63,7 +63,7 @@ class BasicComponent
     public:
         bool isWiredOutput(BasicComponent* basicComponent);
         BasicComponent() = default;
-        BasicComponent(Component component, sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation);
+        BasicComponent(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData);
         void clonePointersArray();
         void scanComponents(std::vector<Connection>& connections);
         sf::Vector2<uint8_t> getFragmentPosition();
