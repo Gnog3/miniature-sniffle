@@ -12,15 +12,12 @@ class Peg : public BasicComponent
     public:
         Peg();
         Peg(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition);
-        bool isPeg() override;
+        Component getComponent() override;
         sf::Vector2f getInputPoint() override;
-        sf::Vector2f getOutputPoint() override;
         sf::IntRect getBodyRectangle(sf::Vector2i componentPosition) override;
         sf::IntRect getInputRectangle(sf::Vector2i componentPosition) override;
         sf::IntRect getOutputRectangle(sf::Vector2i componentPosition) override;
-        void drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
         void drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
-        void drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale) override;
 };
 
 

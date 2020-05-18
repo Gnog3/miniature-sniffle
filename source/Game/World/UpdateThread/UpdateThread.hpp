@@ -11,15 +11,20 @@ class UpdateThread
     private:
         std::thread* thread;
         void main(World& world);
-        bool requireStop = false;
+        volatile bool requireStop = false;
+        volatile bool requirePause = false;
+        volatile bool isPaused = false;
+        volatile uint64_t ups = 0;
     public:
+        sf::Clock upsClock;
         Array* array = new Array;
-        uint32_t ups = 0;
         ~UpdateThread();
         void logicLaunch(World& world);
         void logicResume();
         void logicPause();
         void logicStop();
+        uint32_t getUps() const;
+        void resetUps(World& world);
 };
 
 #include "../World.hpp"

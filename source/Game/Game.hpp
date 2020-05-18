@@ -35,13 +35,14 @@ class Game
         World world;
         Interaction interaction; // initialization is in constructor
         float fps = 0;
+        uint32_t ups = 0;
         
         bool isMouseInsideWindow(sf::Vector2i mousePosition);
         sf::Vector2f mouseToCellPosition(sf::Vector2i mousePosition);
         std::string getDrawText();
         void handleMousePress();
     public:
-        //void jk(sf::Vector2i pos);
+        void jk(sf::Vector2i pos);
         Game();
         bool isOpen();
         bool pollEvent(sf::Event& event);

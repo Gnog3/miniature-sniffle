@@ -41,7 +41,7 @@ sf::Vector2f Player::handleMousePosition(sf::Vector2i mousePosition)
     {
         lastMousePosition = mousePosition;
     }
-    return position;
+    return getPosition();
 }
 
 void Player::setPosition(sf::Vector2f value)
@@ -49,9 +49,12 @@ void Player::setPosition(sf::Vector2f value)
     position = value;
 }
 
-sf::Vector2f Player::getPosition()
+sf::Vector2f Player::getPosition() const
 {
-    return position;
+    if (scale == 1)
+        return sf::Vector2f((int) position.x, (int) position.y);
+    else
+        return sf::Vector2f(std::floor(position.x * (float) scale) / (float) scale, std::floor(position.y * (float) scale) / (float) scale);
 }
 
 void Player::setComponent(Component component)
@@ -80,17 +83,15 @@ Rotation Player::rotate(Rotation rotation)
     {
         case Up:
             return Right;
-            break;
         case Right:
             return Down;
-            break;
         case Down:
             return Left;
-            break;
         case Left:
             return Up;
-            break;
     }
+    return Up; // Компилятор говорит, что функция может дойти до когца и ничего не вернуть,
+    // так что оставлю это здесь. Видимо, баг.
 }
 
 void Player::rotate()

@@ -14,7 +14,6 @@
 #include "Component.hpp"
 #include "sfLine/sfLine.hpp"
 
-
 /*
  * Order:
  *  Wired Inputs
@@ -22,10 +21,9 @@
  *  Actual Inputs
  *  Actual Outputs
  */
+
 class BasicComponent;
-
 class Array;
-
 struct Connection
 {
     BasicComponent* component;
@@ -67,10 +65,10 @@ class BasicComponent
         BasicComponent() = default;
         BasicComponent(Component component, sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t rotation);
         void clonePointersArray();
-        void scanComponents(std::vector<Connection>& connections, Scan scan, bool first);
+        void scanComponents(std::vector<Connection>& connections);
         sf::Vector2<uint8_t> getFragmentPosition();
         void replacePointer(BasicComponent* from, BasicComponent* to);
-        void fixMove(BasicComponent& old, Array& array, bool setup);
+        void fixMove(BasicComponent* old, Array& array, bool setup);
         ~BasicComponent();
         void connect(BasicComponent* basicComponent, bool in, Array& array, bool setup);
         void disconnect(BasicComponent* bc, bool in, Array& array, bool setup);
@@ -136,7 +134,7 @@ class BasicComponent
         Rotation getRotation() const;
         void setRotation(Rotation rotation);
         void drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f position, uint8_t scale, Rotation rotation);
-        virtual bool isPeg();
+        virtual Component getComponent();
         virtual void drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale);
         virtual void drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale);
         virtual void drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale);

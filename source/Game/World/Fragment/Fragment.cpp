@@ -32,7 +32,7 @@ void Fragment::addComponent(Component component, sf::Vector2u position, Rotation
         for (uint16_t i = 0; i < componentAmount - 1; i++)
         {
             std::memcpy(newComponentList + i, componentList + i, sizeof(BasicComponent));
-            newComponentList[i].fixMove(componentList[i], array, setup);
+            newComponentList[i].fixMove(&componentList[i], array, setup);
         }
         delete[] componentList;
     }
@@ -59,7 +59,7 @@ bool Fragment::removeComponent(sf::Vector2u position, Array& array)
     if (componentAmount > 0)
     {
         BasicComponent* newComponentList = new BasicComponent[componentAmount];
-        
+
         bool found = false;
         for (uint16_t i = 0; i < componentAmount + 1; i++)
         {
@@ -70,7 +70,7 @@ bool Fragment::removeComponent(sf::Vector2u position, Array& array)
                 continue;
             }
             std::memcpy(newComponentList + i - (found ? 1 : 0), componentList + i, sizeof(BasicComponent));
-            newComponentList[i - (found ? 1 : 0)].fixMove(componentList[i], array, false);
+            newComponentList[i - (found ? 1 : 0)].fixMove(&componentList[i], array, false);
         }
         delete[] componentList;
         componentList = newComponentList;
@@ -124,13 +124,13 @@ void Fragment::shiftState(Array& array)
 }
 void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)
 {
-//    sf::RectangleShape rectangleShape(sf::Vector2f((16 * 11) * scale - 2, (16 * 11) * scale - 2));
-//    rectangleShape.setOutlineColor(sf::Color::Blue);
-//    rectangleShape.setFillColor(sf::Color::Transparent);
-//    rectangleShape.setOutlineThickness(-3);
-//    rectangleShape.setPosition(
-//            ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
-//            chunkPosition);
+    sf::RectangleShape rectangleShape(sf::Vector2f((16 * 11) * scale - 2, (16 * 11) * scale - 2));
+    rectangleShape.setOutlineColor(sf::Color::Blue);
+    rectangleShape.setFillColor(sf::Color::Transparent);
+    rectangleShape.setOutlineThickness(-3);
+    rectangleShape.setPosition(
+            ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + sf::Vector2f(2, 2) +
+            chunkPosition);
     
     sf::Vector2f fragmentPosition = ((sf::Vector2f) position * (float) (16 * 11) - playerPosition) * (float) scale + chunkPosition;
     
@@ -139,7 +139,7 @@ void Fragment::drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, s
         componentList[i].drawBody(window, fragmentPosition, scale);
     }
     
-//    window->draw(rectangleShape);
+    //window->draw(rectangleShape);
 }
 
 void Fragment::drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale)

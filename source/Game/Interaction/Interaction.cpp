@@ -154,7 +154,6 @@ bool Interaction::handleRemoveComponentTry(Game& game)
     if (component == nullptr)
         return false;
     game.world.logicPause();
-    game.world.updateThread.array->deleteComponent(component);
     game.world.removeComponent(cell);
     game.world.logicResume();
     return true;
@@ -212,7 +211,7 @@ bool Interaction::handleEvent(Game& game, sf::Event& event)
     return false;
 }
 
-bool Interaction::update(Game& game)
+void Interaction::update(Game& game)
 {
     sf::Vector2i mousePosition = sf::Mouse::getPosition(game.window);
     if (game.window.hasFocus())
@@ -222,9 +221,7 @@ bool Interaction::update(Game& game)
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            if (handleNewComponentTry(game))
-                return true;
+            handleNewComponentTry(game);
         }
     }
-    return false;
 }

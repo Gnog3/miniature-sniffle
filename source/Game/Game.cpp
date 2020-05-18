@@ -23,55 +23,55 @@ std::string Game::getDrawText()
     sf::Vector2u windowResolution = window.getSize();
     sf::Vector2f pos = player.getPosition();
     sf::Vector2f posMouse = mouseToCellPosition(sf::Mouse::getPosition(window));
-//    string positionString = "X:" + to_string(pos.x) + " Y:" + to_string(pos.y) + "\nX:" +
-//                            to_string(posMouse.x) + " Y:" + to_string(posMouse.y) + "\nX:" +
-//                            to_string((float) player.getPosition().x + windowResolution.x / player.getScale()) + " Y:" +
-//                            to_string((float) player.getPosition().y + windowResolution.y / player.getScale()) + "\nFPS:" +
-//                            to_string(fps) + "\n\nTicks per second: " + to_string(world.updateThread.ups);
-    string positionString = "Ticks per second: " + to_string(world.updateThread.ups);
+    string positionString = "X:" + to_string(pos.x) + " Y:" + to_string(pos.y) + "\nX:" +
+                            to_string(posMouse.x) + " Y:" + to_string(posMouse.y) + "\nX:" +
+                            to_string((float) player.getPosition().x + windowResolution.x / player.getScale()) + " Y:" +
+                            to_string((float) player.getPosition().y + windowResolution.y / player.getScale()) + "\nFPS:" +
+                            to_string(fps) + "\n\nTicks per second: " + to_string(ups);
+//    string positionString = "Ticks per second: " + to_string(ups);
     return positionString;
 }
 
-//void Game::jk(sf::Vector2i pos)
-//{
-//
-//    sf::Vector2i last;
-//    bool first = true;
-//    for (int y = 0; y < 100; y++)
-//    {
-//        for (int x = 0; x < 100; x++)
-//        {
-//            world.addComponent(Component::Inverter, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), Up, true);
-//            if (!first)
-//            {
-//                world.connect(last, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), false, true);
-//            }
-//            first = false;
-//            last = sf::Vector2i(pos.x + x * 2, pos.y + y * 2);
-//        }
-//    }
-//    world.removeComponent(sf::Vector2i(pos.x + 198, pos.y + 198));
-//    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 197), Up);
-//    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 199), Up);
-//    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y + 199), Up);
-//    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y), Up);
-//
-//    world.connect(sf::Vector2i(pos.x + 200, pos.y + 197), sf::Vector2i(pos.x + 200, pos.y + 199), true);
-//    world.connect(sf::Vector2i(pos.x + 196, pos.y + 198), sf::Vector2i(pos.x + 200, pos.y + 197), false);
-//    world.connect(sf::Vector2i(pos.x + 200, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y + 199), true);
-//    world.connect(sf::Vector2i(pos.x - 1, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y), true);
-//    world.connect(sf::Vector2i(pos.x - 1, pos.y), sf::Vector2i(pos.x, pos.y), true);
-//}
+void Game::jk(sf::Vector2i pos)
+{
+
+    sf::Vector2i last;
+    bool first = true;
+    for (int y = 0; y < 100; y++)
+    {
+        for (int x = 0; x < 100; x++)
+        {
+            world.addComponent(Component::Inverter, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), Up, true);
+            if (!first)
+            {
+                world.connect(last, sf::Vector2i(pos.x + x * 2, pos.y + y * 2), false, true);
+            }
+            first = false;
+            last = sf::Vector2i(pos.x + x * 2, pos.y + y * 2);
+        }
+    }
+    world.removeComponent(sf::Vector2i(pos.x + 198, pos.y + 198));
+    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 197), Rotation::Up, true);
+    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 199), Up, true);
+    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y + 199), Up, true);
+    world.addComponent(Component::Peg, sf::Vector2i(pos.x - 1, pos.y), Up, true);
+
+    world.connect(sf::Vector2i(pos.x + 200, pos.y + 197), sf::Vector2i(pos.x + 200, pos.y + 199), true, true);
+    world.connect(sf::Vector2i(pos.x + 196, pos.y + 198), sf::Vector2i(pos.x + 200, pos.y + 197), false, true);
+    world.connect(sf::Vector2i(pos.x + 200, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y + 199), true, true);
+    world.connect(sf::Vector2i(pos.x - 1, pos.y + 199), sf::Vector2i(pos.x - 1, pos.y), true, true);
+    world.connect(sf::Vector2i(pos.x - 1, pos.y), sf::Vector2i(pos.x, pos.y), true, true);
+}
 
 Game::Game()
 {
 //    window.setVerticalSyncEnabled(true);
-//    window.setFramerateLimit(120);
+    //window.setFramerateLimit(120);
     sf::Clock c;
-//    jk(sf::Vector2i(0, 0));
-//    jk(sf::Vector2i(205, 0));
-//    jk(sf::Vector2i(410, 0));
-//    jk(sf::Vector2i(615, 0));
+    //jk(sf::Vector2i(0, 0));
+    //jk(sf::Vector2i(205, 0));
+    //jk(sf::Vector2i(410, 0));
+    //jk(sf::Vector2i(615, 0));
     std::cout << c.getElapsedTime().asSeconds() << " seconds" << std::endl;
     
     deltaTimeClock.restart();
@@ -131,7 +131,6 @@ void Game::handleEvent(sf::Event& event)
                 sf::Vector2f mousePositionAfter = mouseToCellPosition(mousePosition);
                 sf::Vector2f offset = mousePositionAfter - mousePositionBefore;
                 player.move(-offset);
-                player.setPosition(sf::Vector2f(std::floor(player.getPosition().x * (float) scale) / (float) scale, std::floor(player.getPosition().y * (float) scale) / (float) scale));
                 backgroundBoard.handleScale(window.getSize(), scale, player.getPosition());
                 return;
             }
@@ -159,8 +158,7 @@ void Game::handleEvent(sf::Event& event)
 
 void Game::update()
 {
-    if (interaction.update(*this))
-        return;
+    interaction.update(*this);
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     if (window.hasFocus())
     {
@@ -176,7 +174,11 @@ void Game::update()
             player.stopDragging();
     } else
         player.stopDragging();
-    //float deltaTime = deltaTimeClock.restart().asSeconds();
+    if (world.updateThread.upsClock.getElapsedTime().asMilliseconds() >= 1000)
+    {
+        ups = world.updateThread.getUps();
+        world.updateThread.resetUps(world);
+    }
 }
 
 void Game::draw()
@@ -190,7 +192,9 @@ void Game::draw()
     window.clear();
     sf::Clock drawClock;
     backgroundBoard.draw(&window);
+    //world.logicPause();
     world.draw(&window, player.getPosition(), player.getScale());
+    //world.logicResume();
     interaction.drawShadow(*this);
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     

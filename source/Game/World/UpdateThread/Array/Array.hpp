@@ -15,7 +15,6 @@ class Array
     private:
         
         BasicComponent** array[2]{nullptr};
-        //std::mutex mutex;
         uint32_t amountNext = 0;
         uint32_t amountCurrent = 0;
         uint32_t getCurrent = 0;
@@ -30,14 +29,12 @@ class Array
         
         inline BasicComponent* getNext()
         {
-            //std::lock_guard<std::mutex> lg(mutex);
             getCurrent++;
             return (getCurrent - 1) < amountCurrent ? array[0][getCurrent - 1] : nullptr;
         }
         
         inline void add(BasicComponent* basicComponent)
         {
-            //mutex.lock();
             if (amountNext == maxNext)
             {
                 maxNext += INIT_ARRAY_SIZE;
@@ -48,7 +45,6 @@ class Array
                 //std::cout << "You're stupid" << std::endl;
             }
             array[1][amountNext++] = basicComponent;
-            //mutex.unlock();
         }
         
         inline void shift()

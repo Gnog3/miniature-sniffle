@@ -77,13 +77,12 @@ void World::logicStart()
 
 void World::logicResume()
 {
-    worldChangeMutex.unlock();
-    
+    updateThread.logicResume();
 }
 
 void World::logicPause()
 {
-    while (!worldChangeMutex.try_lock());
+    updateThread.logicPause();
 }
 
 void World::logicStop()
@@ -113,7 +112,15 @@ void World::connect(sf::Vector2i from, sf::Vector2i to, bool in, bool setup)
 {
     BasicComponent* first = getComponent(from);
     BasicComponent* second = getComponent(to);
-    
+    if (in)
+    {
+        if (first->isConnected(second, false) || second->isConnected(first, false))
+            return;
+    } else
+    {
+        if (first->isConnected(second, true))
+            return;
+    }
     first->connect(second, in, *updateThread.array, setup);
 }
 
@@ -168,12 +175,12 @@ void World::draw(sf::RenderWindow* window, sf::Vector2f playerPosition, uint8_t 
             if (chunks[absolute] != nullptr)
             {
                 sf::Vector2i position(x, y);
-//                sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
-//                rectangleShape.setOutlineColor(sf::Color::Red);
-//                rectangleShape.setFillColor(sf::Color::Transparent);
-//                rectangleShape.setOutlineThickness(-3);
-//                rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
-//                window->draw(rectangleShape);
+                sf::RectangleShape rectangleShape(sf::Vector2f((4096 * 11) * scale, (4096 * 11) * scale));
+                rectangleShape.setOutlineColor(sf::Color::Red);
+                rectangleShape.setFillColor(sf::Color::Transparent);
+                rectangleShape.setOutlineThickness(-3);
+                rectangleShape.setPosition(((sf::Vector2f) position * (float) (4096 * 11) - playerPosition) * (float) scale);
+                //window->draw(rectangleShape);
                 sf::Vector2f screenFirst = playerPosition;
                 sf::Vector2f screenSecond = screenFirst + resolution / (float) scale;
                 sf::Vector2f chunkFirst = (sf::Vector2f) position * (float) (11 * 4096);

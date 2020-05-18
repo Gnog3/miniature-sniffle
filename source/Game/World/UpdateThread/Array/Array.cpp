@@ -19,21 +19,17 @@ void Array::deleteComponent(BasicComponent* basicComponent)
 {
     if (amountNext > 1)
     {
-        bool isFound = false;
+        uint32_t shift = 0;
         for (uint32_t i = 0; i < amountNext; i++)
         {
             if (array[1][i] == basicComponent)
             {
-                isFound = true;
+                shift++;
                 continue;
             }
-            if (isFound)
-            {
-                array[1][i - 1] = array[1][i];
-            }
+            array[1][i - shift] = array[1][i];
         }
-        if (isFound)
-            amountNext--;
+        amountNext -= shift;
     } else if (amountNext == 1)
     {
         if (array[1][0] == basicComponent)

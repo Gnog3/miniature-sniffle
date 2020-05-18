@@ -65,6 +65,11 @@ Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentP
     data |= 0b1000u;
 }
 
+Component Inverter::getComponent()
+{
+    return Component::Inverter;
+}
+
 sf::Vector2f Inverter::getInputPoint()
 {
     // (position & 0b1111u)
@@ -109,36 +114,6 @@ sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
 void Inverter::update()
 {
     setState(!getInput());
-}
-
-void Inverter::drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)
-{
-    static sf::Texture texture;
-    static sf::Sprite sprite = getBodySprite(&texture);
-    uint16_t rotation = (0b11u & data) * 90;
-    sf::Vector2f position = sf::Vector2f(0b1111u & this->position, (0b11110000u & this->position) >> 4u) * 11.0f;
-    sprite.setRotation(rotation);
-    sprite.setScale(sf::Vector2f(scale, scale));
-    sprite.setPosition(fragmentPosition + (position + sf::Vector2f(5.5f, 5.5f)) * (float) scale);
-    window->draw(sprite);
-}
-
-void Inverter::drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)
-{
-    static sf::Texture texture[4];
-    static sf::Sprite sprite[4]{
-            getPegsSprite(&texture[0], sf::Color(0, 0, 0, 255), sf::Color(0, 0, 0, 255)),
-            getPegsSprite(&texture[1], sf::Color(0, 0, 0, 255), sf::Color::Red),
-            getPegsSprite(&texture[2], sf::Color::Red, sf::Color(0, 0, 0, 255)),
-            getPegsSprite(&texture[3], sf::Color::Red, sf::Color::Red)
-    };
-    uint16_t rotation = (0b11u & data) * 90;
-    uint8_t state = (0b11000u & data) >> 3u;
-    sf::Vector2f position = sf::Vector2f(0b1111u & this->position, (0b11110000u & this->position) >> 4u) * 11.0f;
-    sprite[state].setRotation(rotation);
-    sprite[state].setScale(sf::Vector2f(scale, scale));
-    sprite[state].setPosition(fragmentPosition + (position + sf::Vector2f(5.5f, 5.5f)) * (float) scale);
-    window->draw(sprite[state]);
 }
 
 #pragma clang diagnostic pop

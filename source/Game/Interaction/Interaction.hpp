@@ -22,7 +22,7 @@ class Interaction
         sf::Vector2f getStartConnectionPoint();
         static void drawShadow(Game& game);
         bool handleEvent(Game& game, sf::Event& event);
-        bool update(Game& game);
+        void update(Game& game);
 };
 
 #include "../Game.hpp"
