@@ -1,12 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 project(Game)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 include_directories(${PROJECT_SOURCE_DIR}/2.5.1-SFML/include)
 link_directories(${PROJECT_SOURCE_DIR}/2.5.1-SFML/lib)
-find_library(PTHREAD_LIBRARY pthread)
-#find_package(SFML 2.5 COMPONENTS graphics audio system window REQUIRED)
 
 add_executable(Game
         source/main.cpp
@@ -43,5 +41,5 @@ add_executable(Game
         source/Game/World/UpdateThread/UpdateThread.hpp source/Game/World/UpdateThread/Array/Array.cpp source/Game/World/UpdateThread/Array/Array.hpp source/Game/World/Components/Switch/Switch.cpp source/Game/World/Components/Switch/Switch.hpp source/Game/World/Components/ComponentData.hpp)
 
 target_link_libraries(Game sfml-graphics sfml-audio sfml-system sfml-window)
-target_link_libraries(Game ${PTHREAD_LIBRARY})
+
 #set_target_properties(Game PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
