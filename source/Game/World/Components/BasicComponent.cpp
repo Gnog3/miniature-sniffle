@@ -243,6 +243,7 @@ void BasicComponent::fixMove(BasicComponent* old, Array& array, bool setup)
     if (old->pointers == nullptr)
         return;
     clonePointersArray();
+    replacePointer(old, this);
     std::vector<Connection> connections1;
     std::vector<Connection> connections2;
     old->scanComponents(connections1);
