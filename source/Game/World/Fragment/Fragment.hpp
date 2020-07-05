@@ -15,8 +15,7 @@
 #include "../Components/ComponentData.hpp"
 
 
-class Fragment
-{
+class Fragment {
     private:
         BasicComponent* componentList;
         uint16_t componentAmount = 0;
@@ -32,9 +31,10 @@ class Fragment
         void calculateInputs();
         void fullTick();
         void shiftState(Array& array);
-        void drawBody(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale);
-        void drawWires(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale);
-        void drawPegs(sf::RenderWindow* window, sf::Vector2f playerPosition, sf::Vector2f chunkPosition, uint8_t scale);
+        void drawFunc(sf::RenderWindow& window, sf::Vector2u chunkPosition, void (BasicComponent::*func)(sf::RenderWindow&, sf::Vector2u));
+        void drawBody(sf::RenderWindow& window, sf::Vector2u chunkPosition);
+        void drawWires(sf::RenderWindow& window, sf::Vector2u chunkPosition);
+        void drawPegs(sf::RenderWindow& window, sf::Vector2u chunkPosition);
 };
 
 

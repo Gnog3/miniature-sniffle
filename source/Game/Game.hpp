@@ -9,7 +9,7 @@
 #include <iomanip>
 #include "Rotation.hpp"
 #include "BackgroundBoard/BackgroundBoard.hpp"
-#include "Player/Player.hpp"
+
 #include "World/World.hpp"
 #include "World/Components/Inverter/Inverter.hpp"
 #include "World/Components/Blotter/Blotter.hpp"
@@ -19,10 +19,14 @@
 
 using namespace std;
 
+class Player;
+
 class Interaction;
+
 #include "Interaction/Interaction.hpp"
-class Game
-{
+#include "Player/Player.hpp"
+
+class Game {
         friend Interaction;
     private:
         sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(1280, 720), "sim++", sf::Style::Default, sf::ContextSettings(0, 0, 4));
@@ -32,17 +36,18 @@ class Game
         sf::Font font;
         BasicComponent shadowComponent[Component::AMOUNT];
         Player player;
-        BackgroundBoard backgroundBoard = BackgroundBoard(window.getSize(), player.getScale());
+        BackgroundBoard backgroundBoard = BackgroundBoard(window);
         World world;
-        Interaction interaction; // initialization is in constructor
+        Interaction interaction;
         float fps = 0;
         uint32_t ups = 0;
         
         bool isMouseInsideWindow(sf::Vector2i mousePosition);
-        sf::Vector2f mouseToCellPosition(sf::Vector2i mousePosition);
         std::string getDrawText();
-        void handleMousePress();
+    
     public:
+        void moveWindow(sf::Vector2f offset);
+        static void moveWindow(sf::RenderWindow& window, sf::Vector2f offset);
         void jk(sf::Vector2i pos);
         Game();
         bool isOpen();
@@ -51,7 +56,6 @@ class Game
         void update();
         void draw();
 };
-
 
 
 #endif //GAME_GAME_HPP

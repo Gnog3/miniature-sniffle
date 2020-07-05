@@ -11,15 +11,12 @@
  *  Actual Inputs
  */
 
-void BasicComponent::insertPointer(BasicComponent* basicComponent, uint32_t offset)
-{
+void BasicComponent::insertPointer(BasicComponent* basicComponent, uint32_t offset) {
     uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount;
     BasicComponent** newPointers = new BasicComponent* [amount];
     bool isInserted = false;
-    for (uint32_t i = 0; i < amount; i++)
-    {
-        if (i == offset)
-        {
+    for (uint32_t i = 0; i < amount; i++) {
+        if (i == offset) {
             isInserted = true;
             newPointers[i] = basicComponent;
             continue;
@@ -30,17 +27,13 @@ void BasicComponent::insertPointer(BasicComponent* basicComponent, uint32_t offs
     pointers = newPointers;
 }
 
-void BasicComponent::removePointer(uint32_t index)
-{
+void BasicComponent::removePointer(uint32_t index) {
     uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount;
-    if (amount > 0)
-    {
+    if (amount > 0) {
         BasicComponent** newPointers = new BasicComponent* [amount];
         bool isFound = false;
-        for (uint32_t i = 0; i < amount + 1; i++)
-        {
-            if (i == index)
-            {
+        for (uint32_t i = 0; i < amount + 1; i++) {
+            if (i == index) {
                 isFound = true;
                 continue;
             }
@@ -48,14 +41,12 @@ void BasicComponent::removePointer(uint32_t index)
         }
         delete[] pointers;
         pointers = newPointers;
-    } else
-    {
+    } else {
         pointers = nullptr;
     }
 }
 
-void BasicComponent::addInputWire(BasicComponent* basicComponent)
-{
+void BasicComponent::addInputWire(BasicComponent* basicComponent) {
 //    for (uint8_t i = 0; i < wiredInAmount; i++)
 //        if (getWiredIn(i) == basicComponent)
 //            return;
@@ -63,8 +54,7 @@ void BasicComponent::addInputWire(BasicComponent* basicComponent)
     insertPointer(basicComponent, wiredInAmount - 1);
 }
 
-void BasicComponent::addOutputWire(BasicComponent* basicComponent)
-{
+void BasicComponent::addOutputWire(BasicComponent* basicComponent) {
 //    for (uint8_t i = 0; i < wiredOutAmount; i++)
 //        if (getWiredOut(i) == basicComponent)
 //            return;
@@ -72,34 +62,27 @@ void BasicComponent::addOutputWire(BasicComponent* basicComponent)
     insertPointer(basicComponent, wiredInAmount + wiredOutAmount - 1);
 }
 
-void BasicComponent::addInputActual(BasicComponent* basicComponent)
-{
+void BasicComponent::addInputActual(BasicComponent* basicComponent) {
     for (uint16_t i = 0; i < actualInAmount; i++)
-        if (getActualIn(i) == basicComponent)
-        {
+        if (getActualIn(i) == basicComponent) {
             return;
         }
     actualInAmount++;
     insertPointer(basicComponent, wiredInAmount + wiredOutAmount + actualInAmount - 1);
 }
 
-void BasicComponent::addOutputActual(BasicComponent* basicComponent)
-{
+void BasicComponent::addOutputActual(BasicComponent* basicComponent) {
     for (uint16_t i = 0; i < actualOutAmount; i++)
-        if (getActualOut(i) == basicComponent)
-        {
+        if (getActualOut(i) == basicComponent) {
             return;
         }
     actualOutAmount++;
     insertPointer(basicComponent, wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount - 1);
 }
 
-void BasicComponent::removeInputWire(BasicComponent* basicComponent)
-{
-    for (uint8_t i = 0; i < wiredInAmount; i++)
-    {
-        if (getWiredIn(i) == basicComponent)
-        {
+void BasicComponent::removeInputWire(BasicComponent* basicComponent) {
+    for (uint8_t i = 0; i < wiredInAmount; i++) {
+        if (getWiredIn(i) == basicComponent) {
             wiredInAmount--;
             removePointer(i);
             return;
@@ -108,12 +91,9 @@ void BasicComponent::removeInputWire(BasicComponent* basicComponent)
     std::cout << "Pointer isn't found. wire in." << std::endl;
 }
 
-void BasicComponent::removeOutputWire(BasicComponent* basicComponent)
-{
-    for (uint8_t i = 0; i < wiredOutAmount; i++)
-    {
-        if (getWiredOut(i) == basicComponent)
-        {
+void BasicComponent::removeOutputWire(BasicComponent* basicComponent) {
+    for (uint8_t i = 0; i < wiredOutAmount; i++) {
+        if (getWiredOut(i) == basicComponent) {
             wiredOutAmount--;
             removePointer(wiredInAmount + i);
             return;
@@ -122,12 +102,9 @@ void BasicComponent::removeOutputWire(BasicComponent* basicComponent)
     std::cout << "Pointer isn't found. wire out." << std::endl;
 }
 
-void BasicComponent::removeInputActual(BasicComponent* basicComponent)
-{
-    for (uint16_t i = 0; i < actualInAmount; i++)
-    {
-        if (getActualIn(i) == basicComponent)
-        {
+void BasicComponent::removeInputActual(BasicComponent* basicComponent) {
+    for (uint16_t i = 0; i < actualInAmount; i++) {
+        if (getActualIn(i) == basicComponent) {
             actualInAmount--;
             removePointer(wiredInAmount + wiredOutAmount + i);
             return;
@@ -136,12 +113,9 @@ void BasicComponent::removeInputActual(BasicComponent* basicComponent)
     std::cout << "Pointer isn't found. actual in." << std::endl;
 }
 
-void BasicComponent::removeOutputActual(BasicComponent* basicComponent)
-{
-    for (uint16_t i = 0; i < actualOutAmount; i++)
-    {
-        if (getActualOut(i) == basicComponent)
-        {
+void BasicComponent::removeOutputActual(BasicComponent* basicComponent) {
+    for (uint16_t i = 0; i < actualOutAmount; i++) {
+        if (getActualOut(i) == basicComponent) {
             actualOutAmount--;
             removePointer(wiredInAmount + wiredOutAmount + actualInAmount + i);
             return;
@@ -150,8 +124,7 @@ void BasicComponent::removeOutputActual(BasicComponent* basicComponent)
     std::cout << "Pointer isn't found. actual out." << std::endl;
 }
 
-bool BasicComponent::insertIfNotIn(std::vector<Connection>& connections, Connection connection)
-{
+bool BasicComponent::insertIfNotIn(std::vector<Connection>& connections, Connection connection) {
     for (auto& i : connections)
         if (i.component == connection.component &&
             i.isOutput == connection.isOutput)
@@ -190,16 +163,14 @@ bool BasicComponent::insertIfNotIn(std::vector<Connection>& connections, Connect
 //    actualOutAmount = 0;
 //}
 
-BasicComponent::BasicComponent(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData)
-{
+BasicComponent::BasicComponent(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData) {
     this->position += position.x;
     this->position += position.y << (uint8_t) 4;
     this->fragmentPosition = fragmentPosition;
     data = componentData;
 }
 
-void BasicComponent::clonePointersArray()
-{
+void BasicComponent::clonePointersArray() {
     uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount;
     BasicComponent** newPointers = new BasicComponent* [amount];
     std::memcpy(newPointers, pointers, sizeof(nullptr) * amount);
@@ -208,12 +179,10 @@ void BasicComponent::clonePointersArray()
     //no delete because.
 }
 
-void BasicComponent::scanComponents(std::vector<Connection>& connections)
-{
+void BasicComponent::scanComponents(std::vector<Connection>& connections) {
     if (!insertIfNotIn(connections, Connection{this, false}))
         return;
-    for (uint32_t i = 0; i < wiredInAmount; i++)
-    {
+    for (uint32_t i = 0; i < wiredInAmount; i++) {
         BasicComponent* basicComponent = getWiredIn(i);
         bool isOut = basicComponent->isWiredOutput(this);
         if (isOut)
@@ -223,21 +192,18 @@ void BasicComponent::scanComponents(std::vector<Connection>& connections)
     }
 }
 
-sf::Vector2<uint8_t> BasicComponent::getFragmentPosition()
-{
+sf::Vector2<uint8_t> BasicComponent::getFragmentPosition() {
     return fragmentPosition;
 }
 
-void BasicComponent::replacePointer(BasicComponent* from, BasicComponent* to)
-{
+void BasicComponent::replacePointer(BasicComponent* from, BasicComponent* to) {
     uint32_t amount = wiredInAmount + wiredOutAmount + actualInAmount + actualOutAmount;
     for (uint32_t i = 0; i < amount; i++)
         if (pointers[i] == from)
             pointers[i] = to;
 }
 
-void BasicComponent::fixMove(BasicComponent* old, Array& array, bool setup)
-{
+void BasicComponent::fixMove(BasicComponent* old, Array& array, bool setup) {
     if (!setup)
         array.replaceComponent(old, this);
     if (old->pointers == nullptr)
@@ -255,15 +221,12 @@ void BasicComponent::fixMove(BasicComponent* old, Array& array, bool setup)
         connection.component->replacePointer(old, this);
 }
 
-BasicComponent::~BasicComponent()
-{
+BasicComponent::~BasicComponent() {
     delete[] pointers;
 }
 
-void BasicComponent::connect(BasicComponent* basicComponent, bool in, Array& array, bool setup)
-{
-    if (in)
-    {
+void BasicComponent::connect(BasicComponent* basicComponent, bool in, Array& array, bool setup) {
+    if (in) {
         addInputWire(basicComponent);
         basicComponent->addInputWire(this);
         std::vector<Connection> connections;
@@ -276,31 +239,25 @@ void BasicComponent::connect(BasicComponent* basicComponent, bool in, Array& arr
             else
                 ins.push_back(connection.component);
         for (auto& input : ins)
-            for (auto& output : outs)
-            {
+            for (auto& output : outs) {
                 
                 input->addInputActual(output);
-                if (input->getComponent() != Peg)
-                {
+                if (input->getComponent() != Peg) {
                     if (!setup)
                         array.add(input);
                     output->addOutputActual(input);
                 }
             }
-    } else
-    {
+    } else {
         addOutputWire(basicComponent);
         basicComponent->addInputWire(this);
         std::vector<Connection> connections;
         basicComponent->scanComponents(connections);
-        for (auto& c : connections)
-        {
+        for (auto& c : connections) {
             if (c.component->getComponent() == Peg)
                 c.component->addInputActual(this);
-            else
-            {
-                if (!c.isOutput)
-                {
+            else {
+                if (!c.isOutput) {
                     if (!setup)
                         array.add(c.component);
                     addOutputActual(c.component);
@@ -311,10 +268,8 @@ void BasicComponent::connect(BasicComponent* basicComponent, bool in, Array& arr
     }
 }
 
-void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool setup)
-{
-    if (in)
-    {
+void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool setup) {
+    if (in) {
         removeInputWire(bc);
         bc->removeInputWire(this);
         std::vector<Connection> connections1;
@@ -337,18 +292,15 @@ void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool 
                 ins2.push_back(connection.component);
         bool theSame = false;
         for (auto& i1: ins1)
-            if (!theSame)
-            {
+            if (!theSame) {
                 for (auto& i2 : ins2)
-                    if (i1 == i2)
-                    {
+                    if (i1 == i2) {
                         theSame = true;
                         break;
                     }
             } else
                 break;
-        if (!theSame)
-        {
+        if (!theSame) {
             std::vector<BasicComponent*> sharedOuts;
             for (auto& o1: outs1)
                 for (auto& o2: outs2)
@@ -356,22 +308,18 @@ void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool 
                         sharedOuts.push_back(o1);
             for (auto& input : ins1)
                 for (auto& output : outs2)
-                    if (sharedOuts.empty())
-                    {
+                    if (sharedOuts.empty()) {
                         input->removeInputActual(output);
-                        if (input->getComponent() != Peg)
-                        {
+                        if (input->getComponent() != Peg) {
                             if (!setup)
                                 array.add(input);
                             output->removeOutputActual(input);
                         }
                     } else
                         for (auto& shared : sharedOuts)
-                            if (output != shared)
-                            {
+                            if (output != shared) {
                                 input->removeInputActual(output);
-                                if (input->getComponent() != Peg)
-                                {
+                                if (input->getComponent() != Peg) {
                                     if (!setup)
                                         array.add(input);
                                     output->removeOutputActual(input);
@@ -380,22 +328,18 @@ void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool 
                             }
             for (auto& input: ins2)
                 for (auto& output: outs1)
-                    if (sharedOuts.empty())
-                    {
+                    if (sharedOuts.empty()) {
                         input->removeInputActual(output);
-                        if (input->getComponent() != Peg)
-                        {
+                        if (input->getComponent() != Peg) {
                             if (!setup)
                                 array.add(input);
                             output->removeOutputActual(input);
                         }
                     } else
                         for (auto& shared: sharedOuts)
-                            if (output != shared)
-                            {
+                            if (output != shared) {
                                 input->removeInputActual(output);
-                                if (input->getComponent() != Peg)
-                                {
+                                if (input->getComponent() != Peg) {
                                     if (!setup)
                                         array.add(input);
                                     output->removeOutputActual(input);
@@ -403,8 +347,7 @@ void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool 
                                 break;
                             }
         }
-    } else
-    {
+    } else {
         removeOutputWire(bc);
         bc->removeInputWire(this);
         std::vector<Connection> connections;
@@ -413,16 +356,12 @@ void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool 
         for (auto& c : connections)
             if (c.isOutput && c.component == this)
                 theSame = true;
-        if (!theSame)
-        {
-            for (auto& c : connections)
-            {
+        if (!theSame) {
+            for (auto& c : connections) {
                 if (c.component->getComponent() == Peg)
                     c.component->removeInputActual(this);
-                else
-                {
-                    if (!c.isOutput)
-                    {
+                else {
+                    if (!c.isOutput) {
                         if (!setup)
                             array.add(c.component);
                         removeOutputActual(c.component);
@@ -434,29 +373,24 @@ void BasicComponent::disconnect(BasicComponent* bc, bool in, Array& array, bool 
     }
 }
 
-void BasicComponent::disconnectAll(Array& array)
-{
+void BasicComponent::disconnectAll(Array& array) {
     uint8_t insAmount = wiredInAmount;
     uint8_t outsAmount = wiredOutAmount;
     BasicComponent** ins = new BasicComponent* [insAmount];
     BasicComponent** outs = new BasicComponent* [outsAmount];
-    for (uint8_t i = 0; i < insAmount; i++)
-    {
+    for (uint8_t i = 0; i < insAmount; i++) {
         ins[i] = getWiredIn(i);
     }
-    for (uint8_t i = 0; i < outsAmount; i++)
-    {
+    for (uint8_t i = 0; i < outsAmount; i++) {
         outs[i] = getWiredOut(i);
     }
-    for (uint8_t i = 0; i < insAmount; i++)
-    {
+    for (uint8_t i = 0; i < insAmount; i++) {
         if (ins[i]->isWiredOutput(this))
             ins[i]->disconnect(this, false, array, false);
         else
             disconnect(ins[i], true, array, false);
     }
-    for (uint8_t i = 0; i < outsAmount; i++)
-    {
+    for (uint8_t i = 0; i < outsAmount; i++) {
         disconnect(outs[i], false, array, false);
     }
     delete[] ins;
@@ -464,59 +398,44 @@ void BasicComponent::disconnectAll(Array& array)
     array.deleteComponent(this);
 }
 
-sf::Vector2<uint8_t> BasicComponent::getPosition() const
-{
+sf::Vector2<uint8_t> BasicComponent::getPosition() const {
     return sf::Vector2<uint8_t>((uint8_t) 0b1111 & position, (uint8_t) ((uint8_t) 0b11110000 & position) >> (uint8_t) 4);
 }
 
-bool BasicComponent::isConnected(BasicComponent* bc, bool in)
-{
-    if (in)
-    {
+bool BasicComponent::isConnected(BasicComponent* bc, bool in) {
+    if (in) {
         bool t1 = false, t2 = false;
-        for (uint8_t i = 0; i < wiredInAmount; i++)
-        {
-            if (getWiredIn(i) == bc)
-            {
+        for (uint8_t i = 0; i < wiredInAmount; i++) {
+            if (getWiredIn(i) == bc) {
                 t1 = true;
             }
         }
-        for (uint8_t i = 0; i < bc->getWiredInAmount(); i++)
-        {
-            if (bc->getWiredIn(i) == this)
-            {
+        for (uint8_t i = 0; i < bc->getWiredInAmount(); i++) {
+            if (bc->getWiredIn(i) == this) {
                 t2 = true;
             }
         }
         return t1 && t2;
-    } else
-    {
+    } else {
         return isWiredOutput(bc);
     }
 }
 
-Rotation BasicComponent::getRotation() const
-{
+Rotation BasicComponent::getRotation() const {
     return Rotation(data & 0b11u);
 }
 
-void BasicComponent::setRotation(Rotation rotation)
-{
+void BasicComponent::setRotation(Rotation rotation) {
     data = (data & 0b11111100u) | (uint8_t) rotation;
 }
 
-void BasicComponent::drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f position, uint8_t scale, Rotation rotation)
-{
+void BasicComponent::drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f position, Rotation rotation) {
     sf::Texture texture;
     sf::Texture texture1;
     sf::Sprite bodySprite = getBodySprite(&texture);
     sf::Sprite pegsSprite = getPegsSprite(&texture1, sf::Color::Black, sf::Color::Black);
-    
-    bodySprite.setScale(sf::Vector2f(scale, scale));
-    pegsSprite.setScale(sf::Vector2f(scale, scale));
-    sf::Vector2f origin = sf::Vector2f(5.5f, 5.5f) - bodySprite.getOrigin();
-    bodySprite.setPosition(position + sf::Vector2f(5.5f, 5.5f) * (float) scale);
-    pegsSprite.setPosition(position + sf::Vector2f(5.5f, 5.5f) * (float) scale);
+    bodySprite.setPosition(position + sf::Vector2f(5.5f, 5.5f));
+    pegsSprite.setPosition(position + sf::Vector2f(5.5f, 5.5f));
     bodySprite.setColor(sf::Color(255, 255, 255, 100));
     pegsSprite.setColor(sf::Color(255, 255, 255, 100));
     bodySprite.setRotation((float) rotation * 90);
@@ -525,8 +444,7 @@ void BasicComponent::drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f p
     window->draw(pegsSprite);
 }
 
-Component BasicComponent::getComponent()
-{
+Component BasicComponent::getComponent() {
     return Nothing;
 }
 
@@ -543,59 +461,52 @@ Component BasicComponent::getComponent()
 //    window->draw(sprite);
 //}
 
-void BasicComponent::drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)
-{
+void BasicComponent::drawBody(sf::RenderWindow& window, sf::Vector2u fragmentPosition) {
     static sf::Sprite* sprite[Component::AMOUNT]{nullptr};
     Component thisComponent = getComponent();
-    if (sprite[thisComponent] == nullptr)
-    {
+    if (sprite[thisComponent] == nullptr) {
         sprite[thisComponent] = new sf::Sprite(getBodySprite(new sf::Texture));
     }
     uint16_t rotation = (0b11u & data) * 90;
     sf::Vector2f position = sf::Vector2f(0b1111u & this->position, (0b11110000u & this->position) >> 4u) * 11.0f;
     sprite[thisComponent]->setRotation(rotation);
-    sprite[thisComponent]->setScale(sf::Vector2f(scale, scale));
-    sf::Vector2f calcPos = fragmentPosition + (position + sf::Vector2f(5.5f, 5.5f)) * (float) scale;
+    sf::Vector2f calcPos = (sf::Vector2f) (fragmentPosition * 16u * 11u) + (position + sf::Vector2f(5.5f, 5.5f));
     sprite[thisComponent]->setPosition(calcPos.x, calcPos.y);
-    window->draw(*sprite[thisComponent]);
+    window.draw(*sprite[thisComponent]);
 }
-void BasicComponent::drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)
-{
-    for (uint8_t i = 0; i < wiredOutAmount; i++)
-    {
+
+void BasicComponent::drawWires(sf::RenderWindow& window, sf::Vector2u fragmentPosition) {
+    for (uint8_t i = 0; i < wiredOutAmount; i++) {
         sf::Vector2i fragmentDifference = (sf::Vector2i) (getWiredOut(i)->getFragmentPosition() - this->fragmentPosition);
         
         fragmentDifference.x = fragmentDifference.x > 128 ? fragmentDifference.x - 256 : fragmentDifference.x;
         fragmentDifference.x = fragmentDifference.x <= -128 ? fragmentDifference.x + 256 : fragmentDifference.x;
         fragmentDifference.y = fragmentDifference.y > 128 ? fragmentDifference.y - 256 : fragmentDifference.y;
         fragmentDifference.y = fragmentDifference.y <= -128 ? fragmentDifference.y + 256 : fragmentDifference.y;
-        sf::Vector2f inputPoint = getWiredOut(i)->getInputPoint() * (float) scale + fragmentPosition;
-        sf::Vector2f outputPoint = getOutputPoint() * (float) scale + fragmentPosition;
-        sfLine sfline(sf::Vector2f(inputPoint.x + (fragmentDifference.x * (float) scale * 16 * 11),
-                                   inputPoint.y + (fragmentDifference.y * (float) scale * 16 * 11)), outputPoint, getState() ? sf::Color::Red : sf::Color::Black, scale);
-        sfline.draw(*window);
+        sf::Vector2f inputPoint = getWiredOut(i)->getInputPoint() + (sf::Vector2f) (fragmentPosition * 16u * 11u);
+        sf::Vector2f outputPoint = getOutputPoint() + (sf::Vector2f) (fragmentPosition * 16u * 11u);
+        sfLine sfline(sf::Vector2f(inputPoint.x + (fragmentDifference.x * 16.0f * 11.0f),
+                                   inputPoint.y + (fragmentDifference.y * 16.0f * 11.0f)), outputPoint, getState() ? sf::Color::Red : sf::Color::Black, 1);
+        sfline.draw(window);
     }
-    for (uint8_t i = 0; i < wiredInAmount; i++)
-    {
+    for (uint8_t i = 0; i < wiredInAmount; i++) {
         sf::Vector2i fragmentDifference = (sf::Vector2i) (getWiredIn(i)->getFragmentPosition() - this->fragmentPosition);
         fragmentDifference.x = fragmentDifference.x > 128 ? fragmentDifference.x - 256 : fragmentDifference.x;
         fragmentDifference.x = fragmentDifference.x <= -128 ? fragmentDifference.x + 256 : fragmentDifference.x;
         fragmentDifference.y = fragmentDifference.y > 128 ? fragmentDifference.y - 256 : fragmentDifference.y;
         fragmentDifference.y = fragmentDifference.y <= -128 ? fragmentDifference.y + 256 : fragmentDifference.y;
-        sf::Vector2f first = (getWiredIn(i)->isWiredOutput(this) ? getWiredIn(i)->getOutputPoint() : getWiredIn(i)->getInputPoint()) * (float) scale + fragmentPosition;
-        first += (sf::Vector2f) (fragmentDifference * 16 * 11 * (int) scale);
-        sf::Vector2f second = getInputPoint() * (float) scale + fragmentPosition;
-        sfLine sfline(first, second, getInput() ? sf::Color::Red : sf::Color::Black, scale);
-        sfline.draw(*window);
+        sf::Vector2f first = (getWiredIn(i)->isWiredOutput(this) ? getWiredIn(i)->getOutputPoint() : getWiredIn(i)->getInputPoint()) + (sf::Vector2f) (fragmentPosition * 16u * 11u);
+        first += (sf::Vector2f) (fragmentDifference * 16 * 11);
+        sf::Vector2f second = getInputPoint() + (sf::Vector2f) (fragmentPosition * 16u * 11u);
+        sfLine sfline(first, second, getInput() ? sf::Color::Red : sf::Color::Black, 1);
+        sfline.draw(window);
     }
 }
 
-void BasicComponent::drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale)
-{
+void BasicComponent::drawPegs(sf::RenderWindow& window, sf::Vector2u fragmentPosition) {
     static sf::Sprite* sprite[Component::AMOUNT][4]{nullptr};
     Component thisComponent = getComponent();
-    if (sprite[thisComponent][0] == nullptr)
-    {
+    if (sprite[thisComponent][0] == nullptr) {
         sprite[thisComponent][0] = new sf::Sprite(getPegsSprite(new sf::Texture, sf::Color::Black, sf::Color::Black));
         sprite[thisComponent][1] = new sf::Sprite(getPegsSprite(new sf::Texture, sf::Color::Black, sf::Color::Red));
         sprite[thisComponent][2] = new sf::Sprite(getPegsSprite(new sf::Texture, sf::Color::Red, sf::Color::Black));
@@ -605,57 +516,47 @@ void BasicComponent::drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPos
     uint8_t state = (0b11000u & data) >> 3u;
     sf::Vector2f position = sf::Vector2f(0b1111u & this->position, (0b11110000u & this->position) >> 4u) * 11.0f;
     sprite[thisComponent][state]->setRotation(rotation);
-    sprite[thisComponent][state]->setScale(sf::Vector2f(scale, scale));
-    sf::Vector2f calcPos = fragmentPosition + (position + sf::Vector2f(5.5f, 5.5f)) * (float) scale;
+    sf::Vector2f calcPos = (sf::Vector2f) (fragmentPosition * 16u * 11u) + (position + sf::Vector2f(5.5f, 5.5f));
     sprite[thisComponent][state]->setPosition(calcPos.x, calcPos.y);
-    window->draw(*sprite[thisComponent][state]);
+    window.draw(*sprite[thisComponent][state]);
 }
 
-bool BasicComponent::isWiredOutput(BasicComponent* basicComponent)
-{
+bool BasicComponent::isWiredOutput(BasicComponent* basicComponent) const {
     for (uint8_t i = 0; i < wiredOutAmount; i++)
         if (getWiredOut(i) == basicComponent)
             return true;
     return false;
 }
 
-sf::Vector2f BasicComponent::getInputPoint()
-{
+sf::Vector2f BasicComponent::getInputPoint() {
     return sf::Vector2f();
 }
 
-sf::Vector2f BasicComponent::getOutputPoint()
-{
+sf::Vector2f BasicComponent::getOutputPoint() {
     return sf::Vector2f();
 }
 
-sf::IntRect BasicComponent::getBodyRectangle(sf::Vector2i componentPosition)
-{
+sf::IntRect BasicComponent::getBodyRectangle(sf::Vector2u componentPosition) {
     return sf::IntRect();
 }
 
-sf::IntRect BasicComponent::getInputRectangle(sf::Vector2i componentPosition)
-{
+sf::IntRect BasicComponent::getInputRectangle(sf::Vector2u componentPosition) {
     return sf::IntRect();
 }
 
-sf::IntRect BasicComponent::getOutputRectangle(sf::Vector2i componentPosition)
-{
+sf::IntRect BasicComponent::getOutputRectangle(sf::Vector2u componentPosition) {
     return sf::IntRect();
 }
 
-sf::Sprite BasicComponent::getBodySprite(sf::Texture* texture)
-{
+sf::Sprite BasicComponent::getBodySprite(sf::Texture* texture) {
     return sf::Sprite();
 }
 
-sf::Sprite BasicComponent::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out)
-{
+sf::Sprite BasicComponent::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out) {
     return sf::Sprite();
 }
 
-void BasicComponent::update()
-{}
+void BasicComponent::update() {}
 
 
 #pragma clang diagnostic pop

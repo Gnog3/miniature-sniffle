@@ -23,22 +23,22 @@
  */
 
 class BasicComponent;
+
 class Array;
-struct Connection
-{
+
+struct Connection {
     BasicComponent* component;
     bool isOutput;
 };
 
-enum Scan : bool
-{
+enum Scan : bool {
     Input = false,
     Output = true
 };
+
 #include "../UpdateThread/Array/Array.hpp"
 
-class BasicComponent
-{
+class BasicComponent {
     protected:
         uint8_t position = 0; // 1 byte
         uint8_t data = 0; // 1 byte (4 bits in use) // 4 bit nothing / in (calculates before update) / outCurrent / outNext / rotation rotation
@@ -61,7 +61,7 @@ class BasicComponent
         void removeOutputActual(BasicComponent* basicComponent);
         static bool insertIfNotIn(std::vector<Connection>& connections, Connection connection);
     public:
-        bool isWiredOutput(BasicComponent* basicComponent);
+        bool isWiredOutput(BasicComponent* basicComponent) const;
         BasicComponent() = default;
         BasicComponent(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData);
         void clonePointersArray();
@@ -75,30 +75,23 @@ class BasicComponent
         void disconnectAll(Array& array);
         sf::Vector2<uint8_t> getPosition() const;
         
-        inline void calculateInput()
-        {
+        inline void calculateInput() {
             for (uint16_t i = 0; i < actualInAmount; i++)
-                if (getActualIn(i)->getState())
-                {
+                if (getActualIn(i)->getState()) {
                     data |= 0b10000u;
                     return;
                 }
             data &= 0b11101111u;
         }
         
-        inline bool getState() const
-        { return data & 0b1000u; }
+        inline bool getState() const { return data & 0b1000u; }
         
-        inline bool getInput() const
-        { return data & 0b10000u; }
+        inline bool getInput() const { return data & 0b10000u; }
         
-        inline void setState(bool state)
-        { data = (data & 0b11111011u) | ((uint8_t) ((uint8_t) state << 2u)); }
+        inline void setState(bool state) { data = (data & 0b11111011u) | ((uint8_t) ((uint8_t) state << 2u)); }
         
-        inline void shiftState(Array& array)
-        {
-            if (((data & 0b100u) << 1u) != (data & 1000u))
-            {
+        inline void shiftState(Array& array) {
+            if (((data & 0b100u) << 1u) != (data & 1000u)) {
                 for (uint16_t i = 0; i < actualOutAmount; i++)
                     array.add(getActualOut(i));
                 data = (data & 0b11110111u) | ((data & 0b100u) << 1u);
@@ -107,42 +100,34 @@ class BasicComponent
         
         bool isConnected(BasicComponent* bc, bool in);
         
-        inline BasicComponent* getWiredIn(uint8_t index) const
-        { return pointers[index]; }
+        inline BasicComponent* getWiredIn(uint8_t index) const { return pointers[index]; }
         
-        inline BasicComponent* getWiredOut(uint8_t index) const
-        { return pointers[wiredInAmount + index]; }
+        inline BasicComponent* getWiredOut(uint8_t index) const { return pointers[wiredInAmount + index]; }
         
-        inline BasicComponent* getActualIn(uint16_t index) const
-        { return pointers[wiredInAmount + wiredOutAmount + index]; }
+        inline BasicComponent* getActualIn(uint16_t index) const { return pointers[wiredInAmount + wiredOutAmount + index]; }
         
-        inline BasicComponent* getActualOut(uint16_t index) const
-        { return pointers[wiredInAmount + wiredOutAmount + actualInAmount + index]; }
+        inline BasicComponent* getActualOut(uint16_t index) const { return pointers[wiredInAmount + wiredOutAmount + actualInAmount + index]; }
         
-        inline uint8_t getWiredInAmount() const
-        { return wiredInAmount; }
+        inline uint8_t getWiredInAmount() const { return wiredInAmount; }
         
-        inline uint8_t getWiredOutAmount() const
-        { return wiredOutAmount; }
+        inline uint8_t getWiredOutAmount() const { return wiredOutAmount; }
         
-        inline uint16_t getActualInAmount() const
-        { return actualInAmount; }
+        inline uint16_t getActualInAmount() const { return actualInAmount; }
         
-        inline uint16_t getActualOutAmount() const
-        { return actualOutAmount; }
+        inline uint16_t getActualOutAmount() const { return actualOutAmount; }
         
         Rotation getRotation() const;
         void setRotation(Rotation rotation);
-        void drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f position, uint8_t scale, Rotation rotation);
+        void drawPreviewTexture(sf::RenderWindow* window, sf::Vector2f position, Rotation rotation);
         virtual Component getComponent();
-        virtual void drawBody(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale);
-        virtual void drawWires(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale);
-        virtual void drawPegs(sf::RenderWindow* window, sf::Vector2f fragmentPosition, uint8_t scale);
+        virtual void drawBody(sf::RenderWindow& window, sf::Vector2u fragmentPosition);
+        virtual void drawWires(sf::RenderWindow& window, sf::Vector2u fragmentPosition);
+        virtual void drawPegs(sf::RenderWindow& window, sf::Vector2u fragmentPosition);
         virtual sf::Vector2f getInputPoint();
         virtual sf::Vector2f getOutputPoint();
-        virtual sf::IntRect getBodyRectangle(sf::Vector2i componentPosition);
-        virtual sf::IntRect getInputRectangle(sf::Vector2i componentPosition);
-        virtual sf::IntRect getOutputRectangle(sf::Vector2i componentPosition);
+        virtual sf::IntRect getBodyRectangle(sf::Vector2u componentPosition);
+        virtual sf::IntRect getInputRectangle(sf::Vector2u componentPosition);
+        virtual sf::IntRect getOutputRectangle(sf::Vector2u componentPosition);
         virtual sf::Sprite getBodySprite(sf::Texture* texture);
         virtual sf::Sprite getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out);
         virtual void update();

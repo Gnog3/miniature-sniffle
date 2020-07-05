@@ -4,27 +4,21 @@
 
 using namespace std;
 
-int main()
-{
+int main() {
     // Game
     {
-        if (sizeof(nullptr) == 8)
-        {
+        if (sizeof(nullptr) == 8) {
             std::cout << "x64" << std::endl;
-        }
-        else if (sizeof(nullptr) == 4)
-        {
+        } else if (sizeof(nullptr) == 4) {
             std::cout << "x32" << std::endl;
         }
     } // Detecting bitness
     
     Game game;
     
-    while (game.isOpen())
-    {
+    while (game.isOpen()) {
         sf::Event event{};
-        while (game.pollEvent(event))
-        {
+        while (game.pollEvent(event)) {
             game.handleEvent(event);
         }
         game.update();

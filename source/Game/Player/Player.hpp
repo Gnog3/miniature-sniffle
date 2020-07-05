@@ -5,31 +5,29 @@
 #include <cstdint>
 #include <iostream>
 #include <cmath>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include "../Rotation.hpp"
 #include "../World/Components/Component.hpp"
 #include "../PlayerState.hpp"
-using namespace std;
-class Player
-{
+
+class Game;
+
+class Player {
     private:
-        sf::Vector2f position = sf::Vector2f(0, 0);
         sf::Vector2i lastMousePosition;
-        uint8_t scale = 8;
         bool dragging = false;
         Component selectedComponent = Nothing;
         Rotation selectedRotation = Rotation::Up;
         PlayerState state = Normal;
+        float zoom = 1.0f;
     public:
-        void move(sf::Vector2f offset);
         void startDragging();
         void stopDragging();
-        void setScale(uint8_t scale);
-        uint8_t getScale() const;
-        sf::Vector2f handleMousePosition(sf::Vector2i mousePosition);
-        void setPosition(sf::Vector2f value);
-        sf::Vector2f getPosition() const;
+        void handleMousePosition(sf::RenderWindow& window, sf::Vector2i mousePosition);
         void setComponent(Component component);
         Component getActiveComponent();
+        void setZoom(float zoom);
+        float getZoom() const;
         void setRotation(Rotation rotation);
         void rotate();
         static Rotation rotate(Rotation rotation);
@@ -37,5 +35,7 @@ class Player
         void setState(PlayerState state);
         PlayerState getState();
 };
+
+#include "../Game.hpp"
 
 #endif //GAME_PLAYER_HPP

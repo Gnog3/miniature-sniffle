@@ -3,8 +3,7 @@
 
 #include "Inverter.hpp" // in out
 
-sf::Sprite Inverter::getBodySprite(sf::Texture* texture)
-{
+sf::Sprite Inverter::getBodySprite(sf::Texture* texture) {
     sf::Sprite sprite;
     texture->create(11, 14);
     uint8_t array[11 * 14 * 4]{
@@ -25,13 +24,11 @@ sf::Sprite Inverter::getBodySprite(sf::Texture* texture)
     };
     texture->update(array);
     sprite.setTexture(*texture);
-    sprite.setScale(sf::Vector2f(8, 8));
     sprite.setOrigin(sf::Vector2f(5.5, 8.5));
     return sprite;
 }
 
-sf::Sprite Inverter::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out)
-{
+sf::Sprite Inverter::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out) {
     sf::Sprite sprite;
     texture->create(11, 14);
     uint8_t array[11 * 14 * 4]{
@@ -52,50 +49,40 @@ sf::Sprite Inverter::getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color
     };
     texture->update(array);
     sprite.setTexture(*texture);
-    sprite.setScale(sf::Vector2f(8, 8));
     sprite.setOrigin(sf::Vector2f(5.5, 8.5));
     return sprite;
 }
 
-Inverter::Inverter() : BasicComponent()
-{}
+Inverter::Inverter() : BasicComponent() {}
 
-Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData) : BasicComponent(position, fragmentPosition, componentData)
-{}
+Inverter::Inverter(sf::Vector2<uint8_t> position, sf::Vector2<uint8_t> fragmentPosition, uint8_t componentData) : BasicComponent(position, fragmentPosition, componentData) {}
 
-Component Inverter::getComponent()
-{
+Component Inverter::getComponent() {
     return Component::Inverter;
 }
 
-sf::Vector2f Inverter::getInputPoint()
-{
+sf::Vector2f Inverter::getInputPoint() {
     // (position & 0b1111u)
     // ((position & 0b11110000u) >> 4u)
     return sf::Vector2((float) (position & 0b1111u) * 11 + 5.5f, (float) ((position & 0b11110000u) >> 4u) * 11 + 5.5f);
 }
 
-sf::Vector2f Inverter::getOutputPoint()
-{
+sf::Vector2f Inverter::getOutputPoint() {
     uint8_t rotation = data & 0b11u;
     return getInputPoint() + sf::Vector2f(rotation % 2 ? 8.f * (float) (2 - rotation) : 0, rotation % 2 ? 0 : 8.f * (float) (rotation - 1));
 }
 
-sf::IntRect Inverter::getBodyRectangle(sf::Vector2i componentPosition)
-{
+sf::IntRect Inverter::getBodyRectangle(sf::Vector2u componentPosition) {
     return sf::IntRect(componentPosition.x, componentPosition.y, 11, 11);
 }
 
-sf::IntRect Inverter::getInputRectangle(sf::Vector2i componentPosition)
-{
+sf::IntRect Inverter::getInputRectangle(sf::Vector2u componentPosition) {
     return sf::IntRect(componentPosition.x + 4, componentPosition.y + 4, 3, 3);
 }
 
-sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
-{
+sf::IntRect Inverter::getOutputRectangle(sf::Vector2u componentPosition) {
     Rotation rotation = Rotation(data & 0b11u);
-    switch (rotation)
-    {
+    switch (rotation) {
         case Rotation::Up:
             return sf::IntRect(componentPosition.x + 3, componentPosition.y - 3, 5, 3);
         case Rotation::Right:
@@ -109,8 +96,7 @@ sf::IntRect Inverter::getOutputRectangle(sf::Vector2i componentPosition)
     std::exit(-123);
 }
 
-void Inverter::update()
-{
+void Inverter::update() {
     setState(!getInput());
 }
 

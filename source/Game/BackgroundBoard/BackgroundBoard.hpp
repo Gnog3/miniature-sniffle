@@ -8,20 +8,16 @@
 
 using namespace std;
 
-class BackgroundBoard
-{
+class BackgroundBoard {
     private:
         sf::Texture texture;
         sf::Sprite sprite;
         [[nodiscard]]
         static uint8_t* getColorArray(sf::Color background, sf::Color foreground, uint8_t size, uint8_t thickness);
     public:
-        BackgroundBoard(sf::Vector2u windowResolution, uint8_t initScale);
-        void handleScale(sf::Vector2u windowResolution, uint8_t scale, sf::Vector2f playerPosition);
-        void handlePlayerPosition(sf::Vector2f playerPosition);
-        void handleResolution(sf::Vector2u windowResolution, uint8_t scale);
+        BackgroundBoard(sf::RenderWindow& window);
+        void recalculate(sf::RenderWindow& window);
         void draw(sf::RenderWindow* window);
-    
 };
 
 

@@ -4,10 +4,10 @@
 #include <thread>
 #include "../Components/BasicComponent.hpp"
 #include "Array/Array.hpp"
+
 class World;
 
-class UpdateThread
-{
+class UpdateThread {
     private:
         std::thread* thread;
         void main(World& world);

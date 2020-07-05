@@ -6,13 +6,13 @@
 #include "../World/Components/BasicComponent.hpp"
 #include "../PlayerState.hpp"
 #include "../World/Components/Switch/Switch.hpp"
+
 class Game;
 
-class Interaction
-{
+class Interaction {
     private:
         sf::Vector2f connectionPositionDraw;
-        sf::Vector2i connectionPosition;
+        sf::Vector2u connectionPosition;
         BasicComponent* connectionComponent = nullptr;
         
         bool handleConnectionTry(Game& game);

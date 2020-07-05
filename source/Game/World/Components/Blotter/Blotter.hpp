@@ -6,11 +6,10 @@
 #include <iostream>
 #include <SFML/Graphics/RenderWindow.hpp>
 
-class Blotter : public BasicComponent
-{
+class Blotter : public BasicComponent {
     private:
         sf::Sprite getBodySprite(sf::Texture* texture) override;
-
+        
         sf::Sprite getPegsSprite(sf::Texture* texture, sf::Color in, sf::Color out) override;
     public:
         Blotter();
@@ -18,9 +17,9 @@ class Blotter : public BasicComponent
         Component getComponent() override;
         sf::Vector2f getInputPoint() override;
         sf::Vector2f getOutputPoint() override;
-        sf::IntRect getBodyRectangle(sf::Vector2i componentPosition) override;
-        sf::IntRect getInputRectangle(sf::Vector2i componentPosition) override;
-        sf::IntRect getOutputRectangle(sf::Vector2i componentPosition) override;
+        sf::IntRect getBodyRectangle(sf::Vector2u componentPosition) override;
+        sf::IntRect getInputRectangle(sf::Vector2u componentPosition) override;
+        sf::IntRect getOutputRectangle(sf::Vector2u componentPosition) override;
         void update() override;
 };
 

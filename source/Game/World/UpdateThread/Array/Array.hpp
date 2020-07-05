@@ -10,10 +10,9 @@
 class BasicComponent;
 
 
-class Array
-{
+class Array {
     private:
-        
+
         BasicComponent** array[2]{nullptr};
         uint32_t amountNext = 0;
         uint32_t amountCurrent = 0;
@@ -23,20 +22,17 @@ class Array
     public:
         Array();
         ~Array();
-        
+
         void deleteComponent(BasicComponent* basicComponent);
         void replaceComponent(BasicComponent* from, BasicComponent* to);
-        
-        inline BasicComponent* getNext()
-        {
+
+        inline BasicComponent* getNext() {
             getCurrent++;
             return (getCurrent - 1) < amountCurrent ? array[0][getCurrent - 1] : nullptr;
         }
-        
-        inline void add(BasicComponent* basicComponent)
-        {
-            if (amountNext == maxNext)
-            {
+
+        inline void add(BasicComponent* basicComponent) {
+            if (amountNext == maxNext) {
                 maxNext += INIT_ARRAY_SIZE;
                 BasicComponent** newArray = new BasicComponent* [maxNext];
                 std::memcpy(newArray, array[1], sizeof(nullptr) * (maxNext - INIT_ARRAY_SIZE));
@@ -46,14 +42,12 @@ class Array
             }
             array[1][amountNext++] = basicComponent;
         }
-        
-        inline void shift()
-        {
+
+        inline void shift() {
             BasicComponent** t = array[0];
             array[0] = array[1];
             array[1] = t;
-            if (maxCurrent > INIT_ARRAY_SIZE)
-            {
+            if (maxCurrent > INIT_ARRAY_SIZE) {
                 delete[] array[1];
                 array[1] = new BasicComponent* [INIT_ARRAY_SIZE];
             }
@@ -63,9 +57,12 @@ class Array
             amountNext = 0;
             getCurrent = 0;
         }
-        
-        inline void resetCurrent()
-        {
+
+        inline bool empty() {
+            return getCurrent >= amountCurrent;
+        }
+
+        inline void resetCurrent() {
             getCurrent = 0;
         }
 };

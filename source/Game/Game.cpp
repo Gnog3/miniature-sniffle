@@ -3,53 +3,65 @@
 
 #include "Game.hpp"
 
-bool Game::isMouseInsideWindow(sf::Vector2i mousePosition)
-{
+bool Game::isMouseInsideWindow(sf::Vector2i mousePosition) {
     sf::Vector2u windowResolution = window.getSize();
     return mousePosition.x >= 0 && mousePosition.y >= 0 && mousePosition.x < windowResolution.x &&
            mousePosition.y < windowResolution.y;
 }
 
-sf::Vector2f Game::mouseToCellPosition(sf::Vector2i mousePosition)
-{
-    uint8_t scale = player.getScale();
-    sf::Vector2f position = player.getPosition();
-    return sf::Vector2f(
-            position + sf::Vector2f((float) mousePosition.x / (float) scale, (float) mousePosition.y / (float) scale));
-}
-
-std::string Game::getDrawText()
-{
+std::string Game::getDrawText() {
+    sf::View view = window.getView();
+    
     sf::Vector2u windowResolution = window.getSize();
-    sf::Vector2f pos = player.getPosition();
-    sf::Vector2f posMouse = mouseToCellPosition(sf::Mouse::getPosition(window));
+    sf::Vector2f pos = window.mapPixelToCoords(sf::Vector2i(0, 0));
+    sf::Vector2f posMouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     string positionString = "X:" + to_string(pos.x) + " Y:" + to_string(pos.y) + "\nX:" +
-                            to_string(posMouse.x) + " Y:" + to_string(posMouse.y) + "\nX:" +
-                            to_string((float) player.getPosition().x + windowResolution.x / player.getScale()) + " Y:" +
-                            to_string((float) player.getPosition().y + windowResolution.y / player.getScale()) + "\nFPS:" +
+                            to_string(posMouse.x) + " Y:" + to_string(posMouse.y) + "\nFPS: " +
                             to_string(fps) + "\n\nTicks per second: " + to_string(ups);
 //    string positionString = "Ticks per second: " + to_string(ups);
     return positionString;
 }
 
-void Game::jk(sf::Vector2i pos)
-{
 
-//    sf::Vector2i last;
-//    bool first = true;
-//    for (int y = 0; y < 100; y++)
-//    {
-//        for (int x = 0; x < 200; x++)
-//        {
-//            world.addComponent(Component::Inverter, sf::Vector2i(pos.x + x, pos.y + y * 2), Up, true);
-//            if (!first)
-//            {
-//                world.connect(last, sf::Vector2i(pos.x + x, pos.y + y * 2), false, true);
-//            }
-//            first = false;
-//            last = sf::Vector2i(pos.x + x, pos.y + y * 2);
-//        }
-//    }
+void Game::moveWindow(sf::Vector2f offset) {
+    Game::moveWindow(window, offset);
+}
+
+void Game::moveWindow(sf::RenderWindow& window, sf::Vector2f offset) {
+    sf::Vector2u windowSize = window.getSize();
+    sf::View view = window.getView();
+    view.move(offset);
+    window.setView(view);
+    sf::Vector2f leftUp = window.mapPixelToCoords(sf::Vector2i(0, 0));
+    sf::Vector2f rightDown = window.mapPixelToCoords((sf::Vector2i) windowSize);
+    if (leftUp.x < 0)
+        view.move(sf::Vector2f(-leftUp.x, 0));
+    if (leftUp.y < 0)
+        view.move(sf::Vector2f(0, -leftUp.y));
+    if (rightDown.x > 65535 * 11)
+        view.move(sf::Vector2f(65535 * 11 - rightDown.x, 0));
+    if (rightDown.y > 65535 * 11)
+        view.move(sf::Vector2f(0, 65535 * 11 - rightDown.y));
+    window.setView(view);
+}
+
+void Game::jk(sf::Vector2i pos) {
+    
+    sf::Vector2u last;
+    bool first = true;
+    uint32_t amount = 0;
+    for (uint32_t y = 0; y < 100; y++) {
+        for (uint32_t x = 0; x < 100; x++) {
+            amount++;
+            world.addComponent(Component::Inverter, sf::Vector2u(pos.x + x, pos.y + y * 2), ComponentData::Up, true);
+            if (!first) {
+                world.connect(last, sf::Vector2u(pos.x + x, pos.y + y * 2), false, true);
+            }
+            first = false;
+            last = sf::Vector2u(pos.x + x, pos.y + y * 2);
+        }
+    }
+    cout << "Amount: " << amount << endl;
 //    world.removeComponent(sf::Vector2i(pos.x + 199, pos.y + 198));
 //    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 197), Rotation::Up, true);
 //    world.addComponent(Component::Peg, sf::Vector2i(pos.x + 200, pos.y + 199), Up, true);
@@ -70,20 +82,12 @@ void Game::jk(sf::Vector2i pos)
 //    }`
 }
 
-Game::Game()
-{
+Game::Game() {
 //    window.setVerticalSyncEnabled(true);
     //window.setFramerateLimit(120);
     sf::Clock c;
     //jk(sf::Vector2i(0, 0));
-    //jk(sf::Vector2i(205, 0));
-    //jk(sf::Vector2i(410, 0));
-    //jk(sf::Vector2i(615, 0));
-    world.addComponent(Component::Blotter, sf::Vector2i(5, 5), ComponentData::Right, true);
-    world.addComponent(Component::Peg, sf::Vector2i(5, 8), ComponentData::Up, true);
-    world.addComponent(Component::Peg, sf::Vector2i(8, 8), ComponentData::Up, true);
-    world.connect(sf::Vector2i(5, 5), sf::Vector2i(5, 8), true, true);
-    world.connect(sf::Vector2i(5, 5), sf::Vector2i(8, 8), false, true);
+    
     std::cout << c.getElapsedTime().asSeconds() << " seconds" << std::endl;
     
     deltaTimeClock.restart();
@@ -94,61 +98,65 @@ Game::Game()
     new(&shadowComponent[Component::Peg]) class Peg;
     new(&shadowComponent[Component::Switch]) class Switch;
     world.logicStart();
+    //moveWindow(sf::Vector2f(32768 * 11, 32768 * 11));
 }
 
-bool Game::isOpen()
-{
+bool Game::isOpen() {
     return window.isOpen();
 }
 
-bool Game::pollEvent(sf::Event& event)
-{
+bool Game::pollEvent(sf::Event& event) {
     return window.pollEvent(event);
 }
 
-void Game::handleEvent(sf::Event& event)
-{
+void Game::handleEvent(sf::Event& event) {
     if (interaction.handleEvent(*this, event))
         return;
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     if (event.type == sf::Event::Closed ||
-        (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
-    {
+        (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
         window.close();
         return;
     }
-    if (event.type == sf::Event::Resized)
-    {
-        window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
-        backgroundBoard.handleResolution(window.getSize(), player.getScale());
+    if (event.type == sf::Event::Resized) {
+        sf::View view = window.getView();
+        float zoom = player.getZoom();
+        view.setSize((float) event.size.width / zoom, (float) event.size.height / zoom);
+        window.setView(view);
+        moveWindow(sf::Vector2f(0, 0));
+        backgroundBoard.recalculate(window);
     }
-    if (window.hasFocus())
-    {
-        if (isMouseInsideWindow(mousePosition))
-        {
-            if (event.type == sf::Event::MouseWheelMoved)
-            {
+    if (window.hasFocus()) {
+        if (isMouseInsideWindow(mousePosition)) {
+            if (event.type == sf::Event::MouseWheelMoved) {
                 int8_t delta = event.mouseWheel.delta;
-                uint8_t scale = player.getScale();
-                sf::Vector2f mousePositionBefore = mouseToCellPosition(mousePosition);
-                switch (delta)
-                {
+                float zoom = player.getZoom();
+                switch (delta) {
                     case 1:
-                        scale = scale < 255 ? scale + 1 : scale;
+                        if (zoom < 1.f)
+                            zoom *= 2;
+                        else
+                            zoom++;
                         break;
-                    case (-1):
-                        scale = scale > 1 ? scale - 1 : scale;
+                    case -1:
+                        if (zoom >= (1.f / 16.f)) {
+                            if (zoom <= 1.f)
+                                zoom /= 2;
+                            else
+                                zoom--;
+                        }
                         break;
                 }
-                player.setScale(scale);
-                sf::Vector2f mousePositionAfter = mouseToCellPosition(mousePosition);
-                sf::Vector2f offset = mousePositionAfter - mousePositionBefore;
-                player.move(-offset);
-                backgroundBoard.handleScale(window.getSize(), scale, player.getPosition());
+                player.setZoom(zoom);
+                sf::Vector2u windowSize = window.getSize();
+                sf::View view = window.getView();
+                view.setSize(windowSize.x / zoom, windowSize.y / zoom);
+                window.setView(view);
+                moveWindow(sf::Vector2f(0, 0));
+                backgroundBoard.recalculate(window);
                 return;
             }
-            if (event.type == sf::Event::KeyPressed)
-            {
+            if (event.type == sf::Event::KeyPressed) {
                 bool ret = true;
                 if (event.key.code == sf::Keyboard::R)
                     player.rotate();
@@ -171,17 +179,14 @@ void Game::handleEvent(sf::Event& event)
     }
 }
 
-void Game::update()
-{
+void Game::update() {
     interaction.update(*this);
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-    if (window.hasFocus())
-    {
-        if (isMouseInsideWindow(mousePosition))
-        {
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-            {
-                backgroundBoard.handlePlayerPosition(player.handleMousePosition(mousePosition));
+    if (window.hasFocus()) {
+        if (isMouseInsideWindow(mousePosition)) {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+                player.handleMousePosition(window, mousePosition);
+                backgroundBoard.recalculate(window);
                 player.startDragging();
             } else
                 player.stopDragging();
@@ -189,17 +194,15 @@ void Game::update()
             player.stopDragging();
     } else
         player.stopDragging();
-    if (world.updateThread.upsClock.getElapsedTime().asMilliseconds() >= 1000)
-    {
+    if (world.updateThread.upsClock.getElapsedTime().asMilliseconds() >= 1000) {
         ups = world.updateThread.getUps();
         world.updateThread.resetUps(world);
     }
+    std::this_thread::yield();
 }
 
-void Game::draw()
-{
-    if (fpsClock.getElapsedTime().asMilliseconds() >= 1000)
-    {
+void Game::draw() {
+    if (fpsClock.getElapsedTime().asMilliseconds() >= 1000) {
         fpsClock.restart();
         fps = fpsCount;
         fpsCount = 0;
@@ -208,39 +211,33 @@ void Game::draw()
     sf::Clock drawClock;
     backgroundBoard.draw(&window);
     //world.logicPause();
-    world.draw(&window, player.getPosition(), player.getScale());
+    world.draw(window);
     //world.logicResume();
     interaction.drawShadow(*this);
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     
     stringstream str;
-    if (isMouseInsideWindow(mousePosition))
-    {
+    if (isMouseInsideWindow(mousePosition)) {
         
-        sf::Vector2f mouse = mouseToCellPosition(mousePosition);
-        sf::Vector2f worldPosition = (sf::Vector2f) (((sf::Vector2i) mouse) / 11) - sf::Vector2f(mouse.x < 0 ? 1 : 0, mouse.y < 0 ? 1 : 0);
-        BasicComponent* basicComponent = world.getComponent((sf::Vector2i) worldPosition);
-        if (basicComponent != nullptr)
-        {
-            for (uint32_t i = 0; i < basicComponent->getActualInAmount(); i++)
-            {
+        sf::Vector2f mouse = window.mapPixelToCoords(mousePosition);
+        sf::Vector2u worldPosition = (sf::Vector2u) (((sf::Vector2i) mouse) / 11);
+        BasicComponent* basicComponent = world.getComponent(worldPosition);
+        if (basicComponent != nullptr) {
+            for (uint32_t i = 0; i < basicComponent->getActualInAmount(); i++) {
                 BasicComponent* in = basicComponent->getActualIn(i);
                 sf::RectangleShape rectangleShape;
                 rectangleShape.setSize(sf::Vector2f(2, 1));
-                rectangleShape.setScale(sf::Vector2f(player.getScale(), player.getScale()));
-                sf::Vector2f pos = ((sf::Vector2f) in->getPosition() + (sf::Vector2f) in->getFragmentPosition() * 16.0f) * 11.0f - player.getPosition();
-                rectangleShape.setPosition(pos * (float) player.getScale());
+                sf::Vector2f pos = ((sf::Vector2f) in->getPosition() + (sf::Vector2f) in->getFragmentPosition() * 16.0f) * 11.0f;
+                rectangleShape.setPosition(pos);
                 rectangleShape.setFillColor(sf::Color::Red);
                 window.draw(rectangleShape);
             }
-            for (uint32_t i = 0; i < basicComponent->getActualOutAmount(); i++)
-            {
+            for (uint32_t i = 0; i < basicComponent->getActualOutAmount(); i++) {
                 BasicComponent* out = basicComponent->getActualOut(i);
                 sf::RectangleShape rectangleShape;
                 rectangleShape.setSize(sf::Vector2f(1, 1));
-                rectangleShape.setScale(sf::Vector2f(player.getScale(), player.getScale()));
-                sf::Vector2f posit = ((sf::Vector2f) out->getPosition() + (sf::Vector2f) out->getFragmentPosition() * 16.0f) * 11.0f - player.getPosition();
-                rectangleShape.setPosition(posit * (float) player.getScale());
+                sf::Vector2f pos = ((sf::Vector2f) out->getPosition() + (sf::Vector2f) out->getFragmentPosition() * 16.0f) * 11.0f;
+                rectangleShape.setPosition(pos);
                 rectangleShape.setFillColor(sf::Color::Green);
                 window.draw(rectangleShape);
             }
@@ -248,20 +245,18 @@ void Game::draw()
         
         sf::RectangleShape rectangleShape;
         rectangleShape.setSize(sf::Vector2f(1, 1));
-        rectangleShape.setScale(sf::Vector2f(player.getScale(), player.getScale()));
-        rectangleShape.setPosition((worldPosition * 11.0f - player.getPosition()) * (float) player.getScale());
+        rectangleShape.setPosition((sf::Vector2f) (worldPosition * 11u));
         rectangleShape.setFillColor(sf::Color::White);
         //window.draw(rectangleShape);
-        BasicComponent* basicComponent1 = world.getComponent((sf::Vector2i) worldPosition);
+        BasicComponent* basicComponent1 = world.getComponent((sf::Vector2u) worldPosition);
         if (basicComponent1 != nullptr);
         //str << "\nBasicComponent:" << basicComponent1 << "\nX:" << worldPosition.x << " Y:" << worldPosition.y << "\nX:" << (int) basicComponent1->getFragmentPosition().x << " Y:" << (int) basicComponent1->getFragmentPosition().y;
     }
     
-    if (interaction.isConnecting(*this))
-    {
-        sf::Vector2f firstPoint = (interaction.getStartConnectionPoint() - player.getPosition()) * (float) player.getScale();
-        sf::Vector2f secondPoint = (sf::Vector2f) sf::Mouse::getPosition(window);
-        sfLine sfline(firstPoint, secondPoint, sf::Color::Black, player.getScale());
+    if (interaction.isConnecting(*this)) {
+        sf::Vector2f firstPoint = interaction.getStartConnectionPoint();
+        sf::Vector2f secondPoint = window.mapPixelToCoords(mousePosition);
+        sfLine sfline(firstPoint, secondPoint, sf::Color::Black, 1.f);
         sfline.draw(window);
     }
     
@@ -272,14 +267,18 @@ void Game::draw()
 //    sprite.setColor(sf::Color(255, 255, 255, 100));
 //    sprite.setScale(sf::Vector2f(player.getScale(), player.getScale()));
 //    window.draw(sprite);
-    
+    sf::View worldView = window.getView();
+    sf::Vector2u windowSize = window.getSize();
+    sf::View defaultView = sf::View(sf::FloatRect(0, 0, windowSize.x, windowSize.y));
     std::string positionString = getDrawText();
     sf::Text text(positionString + str.str(), font);
     text.setCharacterSize(18);
     text.setFillColor(sf::Color::White);
     text.setOutlineColor(sf::Color::Black);
     text.setOutlineThickness(3); // Position's text thingy
+    window.setView(defaultView);
     window.draw(text);
+    window.setView(worldView);
     window.display();
     fpsCount++;
 }
