@@ -23,6 +23,7 @@ class Chunk {
         static sf::Vector2u getRelative(uint32_t absolute);
         static sf::Vector2u getFragmentPosition(sf::Vector2u position);
         Chunk(sf::Vector2<uint8_t> position);
+        ~Chunk();
         void addComponent(Component component, sf::Vector2u position, ComponentData componentData, Array& array, bool setup);
         bool removeComponent(sf::Vector2u position, Array& array);
         Fragment* getFragment(sf::Vector2u position);

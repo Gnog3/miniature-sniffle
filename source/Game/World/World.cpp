@@ -33,6 +33,9 @@ World::World() {
 
 World::~World() {
     updateThread.logicStop();
+    for (int i = 0; i < WORLD_SIZE; i++) {
+        delete chunks[i];
+    }
 }
 
 

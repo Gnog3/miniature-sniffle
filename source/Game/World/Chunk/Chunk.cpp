@@ -22,6 +22,13 @@ Chunk::Chunk(sf::Vector2<uint8_t> position) {
     }
 }
 
+Chunk::~Chunk() {
+    for (int i = 0; i < CHUNK_SIZE; i++) {
+        sf::Vector2u fragment = getRelative(i);
+        delete fragments[i];
+    }
+}
+
 void Chunk::addComponent(Component component, sf::Vector2u position, ComponentData componentData, Array& array, bool setup) {
     sf::Vector2u fragment = position / 16u;
     uint32_t absolute = getAbsolute(fragment);
